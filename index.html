@@ -1680,6 +1680,8 @@ License: bitstream-vera
     .float-empty-hint{margin-top:12px;font-size:11px;color:#98a6b7;line-height:1.45}
     .page-item.is-hidden{opacity:.55}
     .page-item.is-hidden .page-title-mini{text-decoration:line-through}
+    .page-show-control{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap}
+    .page-show-check{width:20px!important;height:20px;margin:0;accent-color:#32c98b;cursor:pointer}
     .page-hidden-tag{font-size:10px;background:#f59e0b;color:#111;border-radius:999px;padding:1px 7px;font-weight:800;vertical-align:1px}
     .page-kind{font-size:12px;opacity:.85}
     .page-order-controls{gap:3px;margin-left:4px}
@@ -1733,7 +1735,8 @@ License: bitstream-vera
       <button type="button" class="primary" id="lastSlideShortcut" style="width:100%;margin-bottom:14px">Última página ↓</button>
       <div class="group" id="pagesListGroup" data-mobile-panel="text">
         <h2>Slides realizados <span id="slidesTotal"></span></h2>
-        <p class="hint" style="margin:-6px 0 4px">Clique para editar, arraste para reordenar e use o 👁 para ocultar.</p>
+        <p class="hint" style="margin:-6px 0 4px">Marque Exibir nos slides que devem aparecer na tela. Clique no título para editar.</p>
+        <p class="hint" id="slidesSelected" aria-live="polite"></p>
         <div class="pages" id="pagesList" style="max-height:260px;overflow-y:auto;overscroll-behavior:contain"></div>
       </div>
       <div class="group" id="pagesGroup" data-mobile-panel="text">
@@ -3737,12 +3740,14 @@ License: bitstream-vera
     function renderPagesList() {
       const list = $("pagesList");
       $("slidesTotal").textContent = "(" + pages.length + ")";
+      $("slidesSelected").textContent = pages.filter(page => !isPageHidden(page)).length + " de " + pages.length + " slides selecionados para exibição";
       list.innerHTML = "";
 
       pages.forEach((page, index) => {
-        const btn = document.createElement("button");
+        const btn = document.createElement("div");
+        btn.setAttribute("role", "button");
+        btn.tabIndex = 0;
         btn.className = "page-item" + (index === currentPage ? " active" : "") + (page.hidden === true ? " is-hidden" : "");
-        btn.type = "button";
         btn.draggable = true;
         btn.dataset.index = index;
         btn.innerHTML = `
@@ -3754,14 +3759,14 @@ License: bitstream-vera
             </div>
           </div>
           <div class="page-order-controls">
-            <span class="page-order-btn page-eye" role="button" aria-label="${page.hidden === true ? 'Mostrar' : 'Ocultar'} página na apresentação" title="${page.hidden === true ? 'Oculta — clique para mostrar' : 'Visível — clique para ocultar'}">${page.hidden === true ? '🙈' : '👁'}</span>
+            <label class="page-show-control" title="Selecionar este slide para exibição"><input type="checkbox" class="page-show-check" aria-label="Exibir slide ${index + 1} na apresentação" ${page.hidden === true ? '' : 'checked'}><span>Exibir</span></label>
             <span class="page-order-btn page-up" role="button" aria-label="Mover página para cima" title="Mover para cima">↑</span>
             <span class="page-order-btn page-down" role="button" aria-label="Mover página para baixo" title="Mover para baixo">↓</span>
           </div>
         `;
 
         btn.onclick = (e) => {
-          if (e.target.closest(".page-order-btn")) return;
+          if (e.target.closest(".page-order-btn, .page-show-control")) return;
           currentPage = index;
           syncFormFromPage();
           autoSaveProject();
@@ -3789,10 +3794,15 @@ License: bitstream-vera
           if (typeof scheduleCloudSave === "function") scheduleCloudSave();
         };
 
-        btn.querySelector(".page-eye").addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+        btn.addEventListener("keydown", e => {
+          if (e.target !== btn || !["Enter", " "].includes(e.key)) return;
+          e.preventDefault(); btn.click();
+        });
+        const showCheck = btn.querySelector(".page-show-check");
+        showCheck.addEventListener("change", () => {
           togglePageHidden(index);
+          const replacement = list.querySelector(`[data-index="${index}"] .page-show-check`);
+          if (replacement) replacement.focus({preventScroll:true});
         });
 
         upBtn.addEventListener("click", (e) => {
@@ -5101,10 +5111,16 @@ License: bitstream-vera
     function togglePageHidden(index) {
       if (!Number.isInteger(index)) index = currentPage;
       const page = pages[index]; if (!page) return;
+      if (!isPageHidden(page) && pages.filter(p => !isPageHidden(p)).length <= 1) {
+        alert("Mantenha pelo menos um slide selecionado para exibição.");
+        renderPagesList();
+        return;
+      }
       const change = projectHistoryBegin(isPageHidden(page) ? 'mostrar slide' : 'ocultar slide');
       page.hidden = !isPageHidden(page);
       projectHistoryCommit(change);
       syncFormFromPage(); autoSaveProject();
+      if (typeof scheduleCloudSave === "function") scheduleCloudSave();
     }
     function setPageTheme(id, all, mergeKey) {
       const change = projectHistoryBegin(all ? 'aplicar cores a todas as páginas' : 'mudar cores do layout', mergeKey || '');
