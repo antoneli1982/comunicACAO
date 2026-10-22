@@ -3935,7 +3935,7 @@ License: bitstream-vera
       if (projectDbPromise) return projectDbPromise;
 
       projectDbPromise = new Promise((resolve, reject) => {
-        const request = indexedDB.open("SESE_REGRAS_SEGURANCA_DB", 1);
+        const request = indexedDB.open("COMUNICACAO_DB", 1);
 
         request.onupgradeneeded = () => {
           const db = request.result;
@@ -4005,17 +4005,17 @@ License: bitstream-vera
         const existing = await idbGet("main");
         if (existing && Array.isArray(existing.pages) && existing.pages.length) return false;
 
-        const raw = localStorage.getItem("SESE_STUDIO_PROJECT");
+        const raw = localStorage.getItem("COMUNICACAO_PROJECT");
         if (!raw) return false;
 
         const savedPages = JSON.parse(raw);
         if (!Array.isArray(savedPages) || !savedPages.length) return false;
 
-        const savedCurrent = parseInt(localStorage.getItem("SESE_STUDIO_CURRENT") || "0", 10);
+        const savedCurrent = parseInt(localStorage.getItem("COMUNICACAO_CURRENT") || "0", 10);
         await idbSet("main", {
           pages: savedPages,
           currentPage: Math.max(0, Math.min(Number.isFinite(savedCurrent) ? savedCurrent : 0, savedPages.length - 1)),
-          updatedAt: localStorage.getItem("SESE_STUDIO_AUTOSAVE_AT") || new Date().toISOString(),
+          updatedAt: localStorage.getItem("COMUNICACAO_AUTOSAVE_AT") || new Date().toISOString(),
           migratedFromLocalStorage: true
         });
 
@@ -6029,20 +6029,20 @@ License: bitstream-vera
 </script>
   <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyC4UxOlB_ZxEgMFkBYc8V4_NjvX3IbSd74",
-  authDomain: "regras-de-seguranca.firebaseapp.com",
-  databaseURL: "https://regras-de-seguranca-default-rtdb.firebaseio.com",
-  projectId: "regras-de-seguranca",
-  storageBucket: "regras-de-seguranca.firebasestorage.app",
-  messagingSenderId: "1064146468871",
-  appId: "1:1064146468871:web:d24108886f89198f9f6aa2"
+  "apiKey": "AIzaSyBvitd0TERzFqgqC8bNxeigUPmINB2LmmU",
+  "authDomain": "comunicacao-2afe0.firebaseapp.com",
+  "databaseURL": "https://comunicacao-2afe0-default-rtdb.firebaseio.com",
+  "projectId": "comunicacao-2afe0",
+  "storageBucket": "comunicacao-2afe0.firebasestorage.app",
+  "messagingSenderId": "447989669557",
+  "appId": "1:447989669557:web:26569de34fdefb371fe8fc"
 };
 
 </script>
   <script>
 /* Shared project on Spark: no Storage, billing, authentication or expiry. */
 (() => {
-  const ROOT = 'regras_de_seguranca/projeto';
+  const ROOT = 'comunicacao/projeto';
   const status = document.getElementById('syncStatus');
   const retry = document.getElementById('syncRetry');
   const app = document.querySelector('.app');

@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "comunicacao": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
