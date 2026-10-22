@@ -1730,6 +1730,7 @@ License: bitstream-vera
       </div>
 
       <p class="mobile-editor-heading" id="mobileEditingPage"></p>
+      <button type="button" class="primary" id="lastSlideShortcut" style="width:100%;margin-bottom:14px">Última página ↓</button>
       <div class="group" id="pagesListGroup" data-mobile-panel="text">
         <h2>Slides realizados <span id="slidesTotal"></span></h2>
         <p class="hint" style="margin:-6px 0 4px">Clique para editar, arraste para reordenar e use o 👁 para ocultar.</p>
@@ -1941,6 +1942,7 @@ License: bitstream-vera
         </div>
 
       </div>
+      <button type="button" class="secondary" id="menuTopShortcut" style="width:100%;margin-top:14px">Subir ao topo ↑</button>
     </aside>
 
 
@@ -9450,5 +9452,27 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     }
   })();
   </script>
+
+<script>
+(() => {
+  const sidebar = document.querySelector('.sidebar');
+  const last = document.getElementById('lastSlideShortcut');
+  const top = document.getElementById('menuTopShortcut');
+  const behavior = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+  last.addEventListener('click', () => {
+    if (!pages.length) return;
+    currentPage = pages.length - 1;
+    syncFormFromPage();
+    const list = document.getElementById('pagesList');
+    list.scrollTo({ top: list.scrollHeight, behavior: behavior() });
+  });
+  top.addEventListener('click', () => {
+    sidebar.scrollTo({ top: 0, behavior: behavior() });
+    document.getElementById('pagesList').scrollTo({ top: 0, behavior: behavior() });
+    if (matchMedia('(max-width: 900px)').matches) window.scrollTo({ top: 0, behavior: behavior() });
+    last.focus({ preventScroll: true });
+  });
+})();
+</script>
 </body>
 </html>
