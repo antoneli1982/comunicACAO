@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <meta name="app-version" content="2026.10.22.slides-visiveis" />
+  <meta name="app-version" content="2026.10.23.pausa-slide" />
   <title>SESE Studio - Regras de Segurança</title>
   <!-- Fontes embutidas: o arquivo não depende do Google Fonts e abre sem internet. -->
   <style id="embeddedFonts">
@@ -1699,6 +1699,13 @@ License: bitstream-vera
       .slide .free-text:empty::before{content:none!important}
     }
   </style>
+  <style>
+    .presentation-pause{display:none;position:fixed;z-index:9100;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));min-height:44px;padding:10px 16px;background:#172638;color:#fff;border:1px solid #94a3b8;border-radius:10px;box-shadow:0 2px 10px #0004;cursor:pointer!important}
+    body.tv-mode:not(.intro-playing) .presentation-pause{display:block}
+    .presentation-pause[aria-pressed="true"]{background:#854d0e;border-color:#fde047}
+    .presentation-pause:focus-visible{outline:3px solid #38bdf8;outline-offset:3px}
+    @media print{.presentation-pause{display:none!important}}
+  </style>
 </head>
 <body data-mobile-tab="view" data-workspace="editor">
   <div id="kioskSplash" aria-live="polite">Preparando apresentação…<small id="kioskSplashInfo">Carregando conteúdo</small></div>
@@ -2057,6 +2064,7 @@ License: bitstream-vera
     </div>
   </section>
 
+  <button type="button" class="presentation-pause" id="presentationPauseBtn" aria-pressed="false" title="Manter este slide fixo na tela">⏸ Pausar slide</button>
   <div class="presentation-hud" id="presentationHud" aria-hidden="true">
     <button class="presentation-exit" id="presentationExitBtn">✕ Sair</button>
     <button class="presentation-nav presentation-prev" id="presentationPrevBtn" aria-label="Página anterior">‹</button>
@@ -2202,7 +2210,7 @@ License: bitstream-vera
   </dialog>
 
   <script>
-    const APP_VERSION = "2026.10.22.slides-visiveis";
+    const APP_VERSION = "2026.10.23.pausa-slide";
     console.info("[SESE Studio] versão", APP_VERSION);
     const defaultLogo = "data:image/png;base64,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";
     const defaultCorrectImage = "";
@@ -2231,6 +2239,7 @@ License: bitstream-vera
 
     let autoTvTimer = null;
     let autoTvActive = false;
+    let presentationPaused = false;
     let openingVideoActive = false;
     let openingVideoAttempt = 0;
 
@@ -2453,7 +2462,7 @@ License: bitstream-vera
     }
 
     function goToPresentationPage(index) {
-      if (openingVideoActive) return;
+      if (openingVideoActive || (presentationPaused && document.body.classList.contains("tv-mode"))) return;
       const target = Math.max(0, Math.min(index, pages.length - 1));
       if (target === currentPage) {
         updatePresentationHud();
@@ -4260,12 +4269,32 @@ License: bitstream-vera
     document.addEventListener("touchstart", revealPresentationControls, {passive:true});
     document.addEventListener("keydown", revealPresentationControls);
 
+    function setPresentationPaused(paused) {
+      presentationPaused = paused;
+      const btn = $("presentationPauseBtn");
+      btn.setAttribute("aria-pressed", String(paused));
+      btn.textContent = paused ? "▶ Continuar · slide pausado" : "⏸ Pausar slide";
+      btn.title = paused ? "Retomar a apresentação" : "Manter este slide fixo na tela";
+      if (paused) {
+        if (autoTvTimer) clearInterval(autoTvTimer);
+        autoTvTimer = null;
+      } else {
+        scheduleAutoTvSlides();
+      }
+    }
+    $("presentationPauseBtn").onclick = () => {
+      if (document.body.classList.contains("tv-mode") && !openingVideoActive) {
+        setPresentationPaused(!presentationPaused);
+      }
+    };
+
     function stopAutoTv() {
       if (autoTvTimer) {
         clearInterval(autoTvTimer);
         autoTvTimer = null;
       }
       autoTvActive = false;
+      setPresentationPaused(false);
       const btn = $("autoTvBtn");
       if (btn) { btn.setAttribute("aria-pressed","false"); btn.title="Iniciar TV automática"; btn.setAttribute("aria-label",btn.title); }
     }
@@ -4274,7 +4303,7 @@ License: bitstream-vera
     function scheduleAutoTvSlides() {
       if (autoTvTimer) clearInterval(autoTvTimer);
       autoTvTimer = null;
-      if (!autoTvActive || openingVideoActive) return;
+      if (!autoTvActive || openingVideoActive || presentationPaused) return;
       const select = $("autoTvInterval");
       const seconds = Math.max(5, parseInt(select ? select.value : "10", 10) || 10);
       autoTvTimer = setInterval(() => {
@@ -4282,7 +4311,7 @@ License: bitstream-vera
           stopAutoTv();
           return;
         }
-        if (openingVideoActive) return;
+        if (openingVideoActive || presentationPaused) return;
         // Cada novo ciclo automático também começa pelo vídeo de abertura.
         const order = presentableIndexes();
         if (currentPage >= order[order.length - 1]) startOpeningVideo();
@@ -4426,6 +4455,7 @@ License: bitstream-vera
 
       const tag = (e.target && e.target.tagName || "").toLowerCase();
       if (tag === "input" || tag === "textarea" || tag === "select") return;
+      if (tag === "button" && ["Enter", " "].includes(e.key)) return;
 
       if (["ArrowRight","ArrowDown","PageDown"," ","Enter"].includes(e.key)) {
         e.preventDefault();
@@ -4706,7 +4736,7 @@ License: bitstream-vera
     };
     $("autoTvBtn").onclick = () => autoTvActive ? toggleAutoTv() : requestPresentation(true);
     $("autoTvInterval").addEventListener("change", () => {
-      if (autoTvActive) startAutoTv();
+      if (autoTvActive) scheduleAutoTvSlides();
     });
     $("printBtn").onclick = () => window.print();
     $("presentationPrevBtn").onclick = (e) => { e.stopPropagation(); previousPresentationPage(); };
@@ -6514,7 +6544,7 @@ const firebaseConfig = {
     ['pointerdown', 'keydown', 'touchstart', 'pointermove'].forEach(type =>
       document.addEventListener(type, () => { lastActivity = Date.now(); }, { passive: true, capture: true }));
     setInterval(() => {
-      if (!started) return;
+      if (!started || presentationPaused) return;
       if (openingVideoActive) {
         const limit = (isFinite(video.duration) ? video.duration : 120) + 20;
         if (video.paused || video.ended) videoGuard++; else videoGuard = 0;
