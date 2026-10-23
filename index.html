@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <meta name="app-version" content="2026.10.23.pausa-lista" />
+  <meta name="app-version" content="2026.10.23.abertura-salva" />
   <title>SESE Studio - Regras de Segurança</title>
   <!-- Fontes embutidas: o arquivo não depende do Google Fonts e abre sem internet. -->
   <style id="embeddedFonts">
@@ -2217,7 +2217,7 @@ License: bitstream-vera
   </dialog>
 
   <script>
-    const APP_VERSION = "2026.10.23.pausa-lista";
+    const APP_VERSION = "2026.10.23.abertura-salva";
     console.info("[SESE Studio] versão", APP_VERSION);
     const defaultLogo = "data:image/png;base64,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";
     const defaultCorrectImage = "";
@@ -9331,14 +9331,27 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     }
 
     async function fetchOpeningVideo() {
-      const src = document.getElementById('openingVideo')?.dataset.src;
-      if (!src) return null;
+      const src = document.getElementById('openingVideo')?.dataset.src || 'abertura-sese.mp4';
+      const url = new URL(src, location.href).href;
+      let cache = null;
+      try { if ('caches' in window) cache = await caches.open('sese-opening-video-v1'); } catch {}
+      const asFile = async response => {
+        if (!response || !response.ok) return null;
+        const blob = await response.blob();
+        if (!blob.size || /text\/html|application\/json/i.test(blob.type)) return null;
+        return new File([blob], 'abertura-sese.mp4', { type: blob.type || 'video/mp4' });
+      };
       try {
-        const res = await fetch(new URL(src, location.href).href);
-        if (!res.ok) return null;
-        const blob = await res.blob();
-        return blob.size ? new File([blob], src.split('/').pop(), { type: blob.type || 'video/mp4' }) : null;
-      } catch { return null; }
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60000);
+        try {
+          const response = await fetch(url, { signal: controller.signal });
+          const file = await asFile(response.clone());
+          if (file && cache) { try { await cache.put(url, new Response(file, { headers: { 'Content-Type': file.type } })); } catch {} }
+          if (file) return file;
+        } finally { clearTimeout(timeout); }
+      } catch {}
+      try { return cache ? await asFile(await cache.match(url)) : null; } catch { return null; }
     }
 
     async function exportPowerPoint(videoFile) {
@@ -9454,7 +9467,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
       }
     }
 
-    // Janela de opções (escolha do vídeo de abertura) usada pelo MP4 completo e pelo PowerPoint.
+    // A abertura salva no projeto é carregada automaticamente para as exportações.
     const pptDialog = document.createElement('dialog');
     pptDialog.style.cssText = 'width:min(460px,calc(100vw - 32px));padding:24px;border:0;border-radius:18px;color:#172638;font-family:Montserrat,Arial,sans-serif;box-shadow:0 24px 80px #0006';
     pptDialog.innerHTML = `
@@ -9463,14 +9476,33 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
       <label style="display:flex;gap:8px;align-items:center;color:#172638;font-size:14px;margin:0 0 10px"><input type="checkbox" id="pptWithVideo" checked> Incluir o vídeo de abertura</label>
       <div id="pptVideoBox" style="background:#f1f5f9;border-radius:12px;padding:12px;font-size:13px;line-height:1.5">
         <div id="pptVideoStatus" style="margin-bottom:8px"></div>
-        <input type="file" id="pptVideoFile" accept="video/mp4,video/*" style="color:#172638;font-size:13px;width:100%">
+        <button type="button" id="pptVideoRetry" style="background:#edf2f7;color:#172638" hidden>Tentar carregar novamente</button>
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
         <button type="button" id="pptCancel" style="background:#edf2f7;color:#172638">Cancelar</button>
         <button type="button" id="pptGo" style="background:#1465ea;color:#fff"></button>
       </div>`;
     document.body.appendChild(pptDialog);
-    let foundVideo = null, dialogMode = 'mp4';
+    let foundVideo = null, dialogMode = 'mp4', videoLoading = null;
+    function updateExportAvailability() {
+      document.getElementById('pptGo').disabled = document.getElementById('pptWithVideo').checked && !foundVideo;
+    }
+    async function loadSavedOpeningVideo() {
+      const status = document.getElementById('pptVideoStatus');
+      const retry = document.getElementById('pptVideoRetry');
+      retry.hidden = true;
+      if (!foundVideo) {
+        status.textContent = 'Carregando o vídeo de abertura salvo no projeto…';
+        updateExportAvailability();
+        if (!videoLoading) videoLoading = fetchOpeningVideo().finally(() => { videoLoading = null; });
+        foundVideo = await videoLoading;
+      }
+      status.textContent = foundVideo
+        ? '✓ Abertura SESÉ salva e pronta. Ela será incluída automaticamente.'
+        : 'Não foi possível carregar a abertura salva. Verifique a conexão e tente novamente.';
+      retry.hidden = !!foundVideo;
+      updateExportAvailability();
+    }
 
     async function openExportDialog(mode) {
       dialogMode = mode;
@@ -9480,21 +9512,20 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
         ? `Gera um único vídeo MP4: primeiro a abertura (com som), depois todas as ${pages.filter(p => !isPageHidden(p)).length} páginas visíveis, ${intervalSeconds()} s cada, com transição suave. A gravação acontece em tempo real; deixe esta aba aberta e visível até terminar.`
         : 'Todas as páginas viram slides editáveis, que trocam sozinhos e se repetem. O vídeo de abertura entra no primeiro slide e começa a tocar automaticamente.';
       document.getElementById('pptGo').textContent = mp4 ? 'Gerar MP4' : 'Gerar PowerPoint';
-      document.getElementById('pptVideoFile').value = '';
-      document.getElementById('pptVideoStatus').innerHTML = 'Procurando o vídeo <b>abertura-sese.mp4</b>…';
+      updateExportAvailability();
       pptDialog.showModal();
-      foundVideo = foundVideo || await fetchOpeningVideo();
-      document.getElementById('pptVideoStatus').innerHTML = foundVideo
-        ? `Vídeo encontrado: <b>${foundVideo.name}</b> (${(foundVideo.size / 1048576).toFixed(1)} MB). Se quiser outro, escolha abaixo.`
-        : 'Selecione o arquivo do vídeo de abertura (<b>abertura-sese.mp4</b>, que fica na mesma pasta deste HTML):';
+      await loadSavedOpeningVideo();
     }
-    document.getElementById('pptWithVideo').onchange = e => { document.getElementById('pptVideoBox').style.opacity = e.target.checked ? 1 : .4; };
+    document.getElementById('pptVideoRetry').onclick = loadSavedOpeningVideo;
+    document.getElementById('pptWithVideo').onchange = e => {
+      document.getElementById('pptVideoBox').style.opacity = e.target.checked ? 1 : .4;
+      updateExportAvailability();
+    };
     document.getElementById('pptCancel').onclick = () => pptDialog.close();
     document.getElementById('pptGo').onclick = () => {
       const withVideo = document.getElementById('pptWithVideo').checked;
-      const picked = document.getElementById('pptVideoFile').files[0] || foundVideo;
-      if (withVideo && !picked) { alert('Escolha o arquivo do vídeo de abertura ou desmarque "Incluir o vídeo de abertura".'); return; }
-      if (picked && document.getElementById('pptVideoFile').files[0]) foundVideo = picked;
+      const picked = foundVideo;
+      if (withVideo && !picked) { loadSavedOpeningVideo(); return; }
       pptDialog.close();
       (dialogMode === 'mp4' ? exportVideo : exportPowerPoint)(withVideo ? picked : null);
     };
