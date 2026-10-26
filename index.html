@@ -3812,6 +3812,7 @@ License: bitstream-vera
             <button type="button" class="page-pause-btn" aria-label="Pausar no slide ${index + 1}" title="${page.hidden === true ? 'Marque Exibir para apresentar este slide' : 'Abrir este slide fixo na apresentação e TV'}" ${page.hidden === true ? 'disabled' : ''}>⏸ Pausar</button>
             <span class="page-order-btn page-up" role="button" aria-label="Mover página para cima" title="Mover para cima">↑</span>
             <span class="page-order-btn page-down" role="button" aria-label="Mover página para baixo" title="Mover para baixo">↓</span>
+            <span class="page-order-btn page-del" role="button" tabindex="0" aria-label="Excluir página ${index + 1}" title="Excluir esta página" style="background:#7f1d1d;border-color:#b91c1c;color:#fff">🗑</span>
           </div>
         `;
 
@@ -3827,6 +3828,25 @@ License: bitstream-vera
           e.stopPropagation();
           presentFixedPage(index);
         });
+
+        const delBtn = btn.querySelector(".page-del");
+        const deleteThisPage = e => {
+          e.stopPropagation(); e.preventDefault();
+          if (pages.length <= 1) { alert("É necessário manter pelo menos uma página."); return; }
+          if (!confirm("Excluir a Página " + (index + 1) + " (" + (page.title || "sem título") + ")? Esta ação não pode ser desfeita facilmente.")) return;
+          const change = projectHistoryBegin('excluir página');
+          pages.splice(index, 1);
+          if (index < currentPage) currentPage -= 1;
+          currentPage = Math.max(0, Math.min(currentPage, pages.length - 1));
+          pages.forEach((item, i) => { item.number = String(i + 1); });
+          projectHistoryCommit(change);
+          renderPagesList();
+          syncFormFromPage();
+          autoSaveProject();
+          if (typeof scheduleCloudSave === "function") scheduleCloudSave();
+        };
+        delBtn.addEventListener("click", deleteThisPage);
+        delBtn.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") deleteThisPage(e); });
 
         const upBtn = btn.querySelector(".page-up");
         const downBtn = btn.querySelector(".page-down");
