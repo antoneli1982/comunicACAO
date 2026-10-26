@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <meta name="app-version" content="2026.10.23.abertura-salva" />
+  <meta name="app-version" content="2026.10.26.favorita-cores-musica" />
   <title>SESE Studio - Regras de Segurança</title>
   <!-- Fontes embutidas: o arquivo não depende do Google Fonts e abre sem internet. -->
   <style id="embeddedFonts">
@@ -1644,6 +1644,21 @@ License: bitstream-vera
     body.tv-mode .float-el{pointer-events:none;cursor:default}
     body.tv-mode .float-el.selected{outline:none}
 
+
+    /* ===== Cores em destaque + página favorita + música ===== */
+    .theme-feat{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;margin-bottom:14px}
+    .theme-feat .feat{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
+    .theme-feat .theme-swatch{width:100%;height:46px}
+    .theme-feat .feat span{font-size:12px;font-weight:800;line-height:1.15;text-align:center;color:#e7edf6;overflow-wrap:anywhere}
+    @keyframes textoLivrePisca{0%,100%{background:#152131;box-shadow:0 0 0 0 rgba(244,191,18,0)}50%{background:#3a3210;box-shadow:0 0 0 4px rgba(244,191,18,.75)}}
+    .layout-picker button[data-layout="text"][aria-pressed="false"]{animation:textoLivrePisca 1s ease-in-out infinite;border-color:#f4bf12}
+    @media (prefers-reduced-motion:reduce){.layout-picker button[data-layout="text"][aria-pressed="false"]{animation:none;box-shadow:0 0 0 3px rgba(244,191,18,.75)}}
+    .layout-picker #textLayoutOptions{grid-column:1/-1;padding:8px 10px;border-radius:10px;background:#101a28;border:1px solid #f4bf12}
+    .layout-picker #textLayoutOptions .hint{margin-top:0!important}
+    .layout-picker button.fav{grid-column:1/-1;border-color:#f4bf12;background:#1e2d44}
+    .layout-picker button.fav span.star{font-size:18px}
+    #musicGroup select,#musicGroup input[type=range]{width:100%}
+
     /* ===== Painéis da barra lateral ===== */
     .layout-picker{display:grid;grid-template-columns:1fr 1fr;gap:8px}
     .layout-picker button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;background:#152131;color:#e7edf6;border:1px solid rgba(255,255,255,.1);font-size:12px;line-height:1.25;text-align:center}
@@ -1772,8 +1787,17 @@ License: bitstream-vera
           <button type="button" data-layout="only-correct" aria-pressed="false"><span aria-hidden="true">✅</span>Só o correto</button>
           <button type="button" data-layout="only-incorrect" aria-pressed="false"><span aria-hidden="true">❌</span>Só o incorreto</button>
           <button type="button" data-layout="text" aria-pressed="false"><span aria-hidden="true">📝</span>Texto livre</button>
+          <div id="textLayoutOptions" hidden>
+          <p class="hint" style="margin-top:10px">Os textos desta página são livres: arraste para qualquer lugar do slide, use a bolinha ↘ para a largura e dê dois cliques para escrever.</p>
+          <div class="btns">
+            <button type="button" class="primary" data-new-text>🔤 + Novo texto</button>
+            <button type="button" class="secondary" data-new-figure title="Opcional: coloque uma figura em qualquer lugar do slide">🖼️ + Nova figura</button>
+          </div>
+        </div>
           <button type="button" data-layout="split" aria-pressed="false"><span aria-hidden="true">🖼️📝</span>Figura + texto<small>tela dividida</small></button>
           <button type="button" data-layout="image" aria-pressed="false"><span aria-hidden="true">🖼️</span>Só figuras<small>tela inteira</small></button>
+          <button type="button" class="fav" id="favLayoutBtn" title="Transforma esta página em: Texto livre + Novo texto + Nova figura"><span class="star" aria-hidden="true">⭐</span>Favorita: Texto livre + Novo texto + Nova figura<small>monta esta página em 1 clique</small></button>
+
         </div>
         <div id="splitOptions" hidden>
           <label>Lado da figura</label>
@@ -1789,13 +1813,6 @@ License: bitstream-vera
             <option value="60">60% da tela</option>
             <option value="65">65% da tela</option>
           </select>
-        </div>
-        <div id="textLayoutOptions" hidden>
-          <p class="hint" style="margin-top:10px">Os textos desta página são livres: arraste para qualquer lugar do slide, use a bolinha ↘ para a largura e dê dois cliques para escrever.</p>
-          <div class="btns">
-            <button type="button" class="primary" data-new-text>🔤 + Novo texto</button>
-            <button type="button" class="secondary" data-new-figure title="Opcional: coloque uma figura em qualquer lugar do slide">🖼️ + Figura <small style="font-weight:500">(opcional)</small></button>
-          </div>
         </div>
         <div id="figureOptions" hidden>
           <label>Encaixe das fotos e figuras</label>
@@ -1880,7 +1897,8 @@ License: bitstream-vera
 
       <div class="group" id="extraThemeGroup" data-mobile-panel="text">
         <h2>Cores e fontes do layout</h2>
-        <div class="theme-grid" id="themeGrid" role="group" aria-label="Paletas de cores"></div>
+        <div class="theme-feat" id="themeFeatured" role="group" aria-label="Cores em destaque"></div>
+        <div class="theme-grid" id="themeGrid" role="group" aria-label="Outras paletas de cores"></div>
         <p class="theme-name" id="themeName">SESÉ Azul (padrão)</p>
         <div class="color-row" id="themeCustomRow">
           <label class="inline">Cor principal <input type="color" id="themeCustomPrimary" value="#1465ea"></label>
@@ -1918,6 +1936,29 @@ License: bitstream-vera
         <div class="emoji-tabs" id="emojiTabs" role="group" aria-label="Categorias de emojis"></div>
         <div class="emoji-grid" id="emojiGrid" role="group" aria-label="Emojis"></div>
         <p class="float-empty-hint" id="floatEmptyHint">Dica: com um campo de texto ativo (título, texto livre ou caixa de texto), o emoji entra direto no texto.</p>
+      </div>
+
+      <div class="group" id="musicGroup" data-mobile-panel="text">
+        <h2>🎵 Música de fundo</h2>
+        <p class="hint" style="margin-top:0">Toca durante a apresentação, menos no vídeo de abertura (ele tem o próprio som). As músicas abaixo são criadas pelo próprio sistema: <strong>100% livres de direitos autorais</strong>.</p>
+        <label for="musicPreset">Estilo</label>
+        <select id="musicPreset">
+          <option value="piano">😌 Descontrair — piano suave</option>
+          <option value="pad">🌌 Som ambiente — nuvens (pads)</option>
+          <option value="rain">🌧️ Natureza — chuva e vento suave</option>
+          <option value="lofi">☕ Relax — ritmo leve (lo-fi)</option>
+          <option value="file">📁 Meu arquivo de áudio</option>
+        </select>
+        <div class="btns">
+          <button type="button" class="primary" id="musicPreviewBtn">▶ Ouvir</button>
+          <button type="button" class="secondary" id="musicUploadBtn">⬆ Meu áudio</button>
+        </div>
+        <input type="file" id="musicFile" accept="audio/*" hidden>
+        <label for="musicVol">Volume <span id="musicVolVal"></span></label>
+        <input type="range" id="musicVol" min="0" max="100" step="1" value="35">
+        <label class="check"><input type="checkbox" id="musicTv" checked> Tocar na apresentação (TV)</label>
+        <label class="check"><input type="checkbox" id="musicExp" checked> Incluir no vídeo MP4 exportado (depois da abertura)</label>
+        <p class="hint" id="musicStatus">Se enviar seu próprio áudio, use só músicas livres (ex.: Pixabay Music, YouTube Audio Library).</p>
       </div>
 
       <div class="group" id="mobile-panel-project">
@@ -4564,7 +4605,7 @@ License: bitstream-vera
       data.textContent = JSON.stringify({...projectSnapshot(),exportId:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)}).replace(/</g,'\\u003c');
       root.querySelector('head').appendChild(data);
       root.querySelectorAll('dialog[open]').forEach(dialog => dialog.removeAttribute('open'));
-      ['#floatLayer', '#themeGrid', '#emojiTabs', '#emojiGrid', '#labelGrid'].forEach(selector => { const el = root.querySelector(selector); if (el) el.innerHTML = ''; });
+      ['#floatLayer', '#themeFeatured', '#themeGrid', '#emojiTabs', '#emojiGrid', '#labelGrid'].forEach(selector => { const el = root.querySelector(selector); if (el) el.innerHTML = ''; });
       const blob = new Blob(['<!DOCTYPE html>\n'+root.outerHTML], {type:"text/html;charset=utf-8"});
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -4968,9 +5009,10 @@ License: bitstream-vera
 
     var SLIDE_THEMES = [
       {id:'sese', name:'SESÉ Azul (padrão)', primary:'#1465ea', bg:'#ffffff'},
+      {id:'qualidade', name:'Qualidade', primary:'#ffffff', bg:'#1465ea'},
       {id:'oceano', name:'Azul oceano', primary:'#0b4f8a', bg:'#f3f7fb'},
       {id:'ceu', name:'Azul céu', primary:'#0284c7', bg:'#f0f9ff'},
-      {id:'verde', name:'Verde segurança', primary:'#0f7a3d', bg:'#f2f8f4'},
+      {id:'verde', name:'Segurança', primary:'#0f7a3d', bg:'#f2f8f4'},
       {id:'menta', name:'Verde menta', primary:'#2a9d8f', bg:'#f1faf8'},
       {id:'turquesa', name:'Turquesa', primary:'#0e7c86', bg:'#f0f9fa'},
       {id:'vermelho', name:'Vermelho alerta', primary:'#b3121b', bg:'#fff6f6'},
@@ -4978,12 +5020,12 @@ License: bitstream-vera
       {id:'laranja', name:'Laranja atenção', primary:'#e36414', bg:'#fff8f1'},
       {id:'amarelo', name:'Amarelo sinalização', primary:'#f4bf12', bg:'#fffbea'},
       {id:'roxo', name:'Roxo', primary:'#5b2a86', bg:'#f7f3fb'},
-      {id:'rosa', name:'Rosa', primary:'#c2185b', bg:'#fff4f8'},
+      {id:'rosa', name:'RH', primary:'#c2185b', bg:'#fff4f8'},
       {id:'terra', name:'Terra', primary:'#7a4a24', bg:'#faf5ef'},
       {id:'grafite', name:'Grafite', primary:'#2f3a45', bg:'#eef1f4'},
       {id:'noturno', name:'Azul noturno (escuro)', primary:'#2563eb', bg:'#0b1424'},
       {id:'industrial', name:'Preto e amarelo (escuro)', primary:'#f4bf12', bg:'#161616'},
-      {id:'contraste', name:'Alto contraste', primary:'#ffff00', bg:'#000000', extra:{text:'#ffffff', ok:'#00ff66', nok:'#ff4d4d', accent:'#ffff00', divider:'#ffff00'}}
+      {id:'contraste', name:'Planejamento e Manutenção (autocontraste)', primary:'#ffff00', bg:'#000000', extra:{text:'#ffffff', ok:'#00ff66', nok:'#ff4d4d', accent:'#ffff00', divider:'#ffff00'}}
     ];
     function deriveTheme(primary, bg, extra) {
       const dark = lumX(bg) < .2;
@@ -5532,18 +5574,31 @@ License: bitstream-vera
     }
 
     /* ---------- Painel de cores ---------- */
+    var FEATURED_THEMES = [['verde', 'Segurança'], ['rosa', 'RH'], ['contraste', 'Planejamento e Manutenção'], ['qualidade', 'Qualidade']];
     function buildThemePanel() {
       const grid = $('themeGrid'); if (!grid) return;
       grid.innerHTML = '';
-      SLIDE_THEMES.forEach(theme => {
+      const feat = $('themeFeatured');
+      const makeSwatch = theme => {
         const t = deriveTheme(theme.primary, theme.bg, theme.extra);
         const button = document.createElement('button');
         button.type = 'button'; button.className = 'theme-swatch'; button.dataset.theme = theme.id;
         button.title = theme.name; button.setAttribute('aria-label', theme.name);
         button.style.setProperty('--pri', theme.primary); button.style.setProperty('--bg', theme.bg); button.style.setProperty('--txt', t.text);
         button.addEventListener('click', () => setPageTheme(theme.id));
-        grid.appendChild(button);
-      });
+        return button;
+      };
+      if (feat) {
+        feat.innerHTML = '';
+        FEATURED_THEMES.forEach(([id, label]) => {
+          const theme = SLIDE_THEMES.find(item => item.id === id); if (!theme) return;
+          const box = document.createElement('div'); box.className = 'feat';
+          const name = document.createElement('span'); name.textContent = label;
+          box.appendChild(makeSwatch(theme)); box.appendChild(name); feat.appendChild(box);
+        });
+      }
+      const featuredIds = feat ? FEATURED_THEMES.map(item => item[0]) : [];
+      SLIDE_THEMES.filter(theme => !featuredIds.includes(theme.id)).forEach(theme => grid.appendChild(makeSwatch(theme)));
       const custom = document.createElement('button');
       custom.type = 'button'; custom.className = 'theme-swatch custom'; custom.dataset.theme = 'custom';
       custom.title = 'Cores personalizadas'; custom.setAttribute('aria-label', 'Cores personalizadas');
@@ -5633,6 +5688,9 @@ License: bitstream-vera
       $('addFloatTextBtn').addEventListener('click', () => addTextElement());
       document.querySelectorAll('[data-new-text]').forEach(button => button.addEventListener('click', addPageTextBox));
       document.querySelectorAll('[data-new-figure]').forEach(button => button.addEventListener('click', () => $('floatImageInput').click()));
+      // Estrutura favorita: Texto livre + Novo texto + Nova figura.
+      const buildFavoritePage = () => { setPageLayout('text'); if (!pageElements(current()).some(el => el.type === 'text')) floatMutate('criar texto livre', list => { list.push(pageTextBox('Escreva aqui o texto desta página.\n• Arraste este texto para onde quiser', {cy:45})); }); addPageTextBox(); $('floatImageInput').click(); };
+      $('favLayoutBtn').addEventListener('click', buildFavoritePage);
       document.querySelectorAll('[data-fit-btn]').forEach(button => button.addEventListener('click', () => setPageOpt('fit', button.dataset.fitBtn, 'mudar encaixe da figura')));
       $('figureFullInput').addEventListener('change', event => setPageOpt('full', event.target.checked, 'figura em tela cheia'));
       $('floatBox').addEventListener('change', event => { if (floatState.selected) updateFloat(floatState.selected, {box:event.target.value, bg:event.target.value === 'plain' ? (pageElements(current()).find(el => el.id === floatState.selected)?.bg || '') : ''}, 'mudar estilo do texto'); });
@@ -9048,9 +9106,10 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     }
 
     async function exportVideo(openingFile) {
-      const codecs = await pickCodecs(!!openingFile);
+      const music = !!(window.seseMusic && seseMusic.wantsExport());
+      const codecs = await pickCodecs(!!openingFile || music);
       if (!codecs) return exportVideoRecorder(openingFile);
-      const tvSafe = codecs.video.mux === 'avc' && (!openingFile || codecs.audio?.mux === 'aac');
+      const tvSafe = codecs.video.mux === 'avc' && (!(openingFile || music) || codecs.audio?.mux === 'aac');
       if (!tvSafe) {
         const why = codecs.video.mux !== 'avc' ? 'gravar a imagem em H.264'
           : !codecs.audio ? 'gravar som' : 'gravar o som em AAC';
@@ -9084,7 +9143,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
         const muxer = new Mp4Muxer.Muxer({
           target: new Mp4Muxer.ArrayBufferTarget(),
           video: { codec: codecs.video.mux, width: W, height: H, frameRate: FPS },
-          ...(opening && codecs.audio ? { audio: { codec: codecs.audio.mux, numberOfChannels: 2, sampleRate: RATE } } : {}),
+          ...((opening || music) && codecs.audio ? { audio: { codec: codecs.audio.mux, numberOfChannels: 2, sampleRate: RATE } } : {}),
           fastStart: 'in-memory',
           firstTimestampBehavior: 'cross-track-offset'
         });
@@ -9109,13 +9168,21 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
         };
 
         // Som: abertura + silêncio até o fim, em blocos de 1024 amostras.
-        if (opening && codecs.audio) {
+        if ((opening || music) && codecs.audio) {
           say('Gravando o som…');
           const aenc = new AudioEncoder({ output: (chunk, meta) => muxer.addAudioChunk(chunk, meta), error: e => { failure = e; } });
           aenc.configure(codecs.audio.cfg);
           const totalFrames = Math.ceil(totalUs / 1e6 * RATE), BLOCK = 1024;
           const left = sound ? sound.getChannelData(0) : null;
           const right = sound ? sound.getChannelData(sound.numberOfChannels > 1 ? 1 : 0) : null;
+          // Música de fundo: começa quando termina a abertura e repete até o fim.
+          let mL = null, mR = null, mLen = 0, mGain = 0;
+          const openFrames = Math.round(openingUs / 1e6 * RATE);
+          if (music) {
+            say('Preparando a música de fundo…');
+            try { const mb = await seseMusic.getBuffer(RATE); mL = mb.getChannelData(0); mR = mb.getChannelData(mb.numberOfChannels > 1 ? 1 : 0); mLen = mb.length; mGain = seseMusic.volume(); }
+            catch (error) { console.warn('Sem música de fundo:', error); }
+          }
           for (let start = 0; start < totalFrames; start += BLOCK) {
             if (failure) throw failure;
             const n = Math.min(BLOCK, totalFrames - start), data = new Float32Array(n * 2);
@@ -9123,6 +9190,15 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
               const m = Math.min(n, left.length - start);
               data.set(left.subarray(start, start + m), 0);
               data.set(right.subarray(start, start + m), n);
+            }
+            if (mL && mLen) {
+              for (let i = 0; i < n; i++) {
+                const fr = start + i - openFrames; if (fr < 0) continue;
+                const remain = (totalFrames - start - i) / RATE;
+                const g = mGain * Math.min(1, fr / RATE / 2) * Math.min(1, remain / 3), k = fr % mLen;
+                data[i] = Math.max(-1, Math.min(1, data[i] + mL[k] * g));
+                data[n + i] = Math.max(-1, Math.min(1, data[n + i] + mR[k] * g));
+              }
             }
             const ad = new AudioData({ format: 'f32-planar', sampleRate: RATE, numberOfFrames: n, numberOfChannels: 2, timestamp: Math.round(start / RATE * 1e6), data });
             aenc.encode(ad); ad.close();
@@ -9175,7 +9251,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
         muxer.finalize();
         download(new Blob([muxer.target.buffer], { type: 'video/mp4' }), 'REGRAS_SESE_COMPLETO.mp4');
         done();
-        const audioNote = !opening ? '' : !codecs.audio ? ' ATENÇÃO: este navegador não gravou som.' : !sound ? ' ATENÇÃO: o vídeo de abertura escolhido não tem som.' : ` Com som (${codecs.audio.mux === 'aac' ? 'AAC' : 'Opus'}).`;
+        const audioNote = !opening ? (music && codecs.audio ? ' Com música de fundo.' : '') : !codecs.audio ? ' ATENÇÃO: este navegador não gravou som.' : !sound ? ' ATENÇÃO: o vídeo de abertura escolhido não tem som.' : ` Com som (${codecs.audio.mux === 'aac' ? 'AAC' : 'Opus'})${music ? ' e música de fundo' : ''}.`;
         alert('Pronto! REGRAS_SESE_COMPLETO.mp4 foi baixado' + (opening ? ', com a abertura e todas as páginas.' : '.') + audioNote +
           ' Copie para o pen drive e, na TV, abra USB > Vídeos. Ative "Repetir" no player da TV para ficar em ciclo.');
       } catch (error) {
@@ -9569,6 +9645,203 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     last.focus({ preventScroll: true });
   });
 })();
+</script>
+<script id="seseMusic">
+(() => {
+  'use strict';
+  const LOOP = 60, TAIL = 8, KEY = 'sese.music.v1';
+  const state = Object.assign({ preset: 'piano', vol: 35, tv: true, exp: true }, (() => { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } })());
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+  const $ = id => document.getElementById(id);
+
+  /* ---------- arquivo próprio (IndexedDB) ---------- */
+  const DB = 'seseMusicDB';
+  const idb = () => new Promise((res, rej) => { const r = indexedDB.open(DB, 1); r.onupgradeneeded = () => r.result.createObjectStore('files'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  const idbGet = async () => { try { const db = await idb(); return await new Promise(res => { const q = db.transaction('files').objectStore('files').get('music'); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); }); } catch (e) { return null; } };
+  const idbPut = async blob => { try { const db = await idb(); await new Promise((res, rej) => { const t = db.transaction('files', 'readwrite'); t.objectStore('files').put(blob, 'music'); t.oncomplete = res; t.onerror = () => rej(t.error); }); return true; } catch (e) { return false; } };
+  let fileBlob = null;
+
+  /* ---------- síntese (tudo original: livre de direitos autorais) ---------- */
+  const rngOf = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  const reverb = (c, secs, decay, seed) => {
+    const len = Math.floor(c.sampleRate * secs), b = c.createBuffer(2, len, c.sampleRate), r = rngOf(seed);
+    for (let ch = 0; ch < 2; ch++) { const d = b.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (r() * 2 - 1) * Math.pow(1 - i / len, decay); }
+    const cv = c.createConvolver(); cv.buffer = b; return cv;
+  };
+  const tone = (c, dest, f, t, dur, o) => {
+    const osc = c.createOscillator(), g = c.createGain(), a = o.a == null ? .01 : o.a, r = o.r == null ? 1 : o.r;
+    osc.type = o.type || 'sine'; osc.frequency.value = f; if (o.detune) osc.detune.value = o.detune;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(o.g, t + a);
+    g.gain.setTargetAtTime(0, t + a + Math.max(0, dur - a), r / 3);
+    osc.connect(g); let n = g;
+    if (o.lp) { const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = o.lp; g.connect(lp); n = lp; }
+    n.connect(dest); osc.start(t); osc.stop(t + a + dur + r + .2);
+  };
+  const noiseBuf = (c, secs, seed) => { const b = c.createBuffer(1, Math.floor(c.sampleRate * secs), c.sampleRate), d = b.getChannelData(0), r = rngOf(seed); let p = 0; for (let i = 0; i < d.length; i++) { const w = r() * 2 - 1; p = p * .6 + w * .4; d[i] = p; } return b; };
+  const noiseSrc = (c, dest, filters, gainAt, seed) => {
+    const s = c.createBufferSource(); s.buffer = noiseBuf(c, 6, seed); s.loop = true;
+    let n = s; filters.forEach(f => { const bq = c.createBiquadFilter(); bq.type = f[0]; bq.frequency.value = f[1]; if (f[2]) bq.Q.value = f[2]; n.connect(bq); n = bq; });
+    const g = c.createGain(); n.connect(g); g.connect(dest); gainAt(g.gain); s.start(0); s.stop(LOOP); return g;
+  };
+  const wobble = (param, r, base, amp, step) => { // automação periódica (começa e termina no mesmo valor)
+    const first = base; param.setValueAtTime(first, 0);
+    for (let t = step; t < LOOP; t += step) param.linearRampToValueAtTime(base + (r() * 2 - 1) * amp, t);
+    param.linearRampToValueAtTime(first, LOOP);
+  };
+
+  const CHORDS = [[48, 52, 55, 59], [45, 48, 52, 55], [41, 45, 48, 52], [43, 47, 50, 52]]; // Cmaj7, Am7, Fmaj7, G6
+  const PENTA = [72, 74, 76, 79, 81, 84];
+
+  const PRESET_FN = {
+    piano(c, out, r) {
+      CHORDS.forEach((ch, i) => {
+        const t0 = i * 15;
+        tone(c, out, mtof(ch[0] - 12), t0, 10, { type: 'sine', g: .22, a: .05, r: 4 });
+        ch.forEach((m, k) => tone(c, out, mtof(m + 12), t0 + k * .06, 3, { type: 'triangle', g: .07, a: .02, r: 3.5, lp: 2400 }));
+        for (let t = t0 + 1.2; t < t0 + 14.2; t += 1.3 + r() * 1.6) {
+          const m = r() < .55 ? ch[Math.floor(r() * ch.length)] + 24 : PENTA[Math.floor(r() * PENTA.length)];
+          tone(c, out, mtof(m), t, 1.4, { type: 'triangle', g: .09 + r() * .04, a: .012, r: 3.2, lp: 3000 });
+          tone(c, out, mtof(m), t, 1.4, { type: 'sine', g: .06, a: .01, r: 2.6 });
+        }
+      });
+    },
+    pad(c, out, r) {
+      CHORDS.forEach((ch, i) => {
+        const t0 = i * 15;
+        ch.forEach(m => [-6, 6].forEach(d => tone(c, out, mtof(m), t0, 12, { type: 'sawtooth', detune: d, g: .028, a: 5, r: 6, lp: 650 })));
+        tone(c, out, mtof(ch[0] - 12), t0, 12, { type: 'sine', g: .16, a: 4, r: 6 });
+        [r() < .5 ? 76 : 79, 83].forEach((m, k) => tone(c, out, mtof(m), t0 + 3 + k * 4 + r() * 2, 4, { type: 'sine', g: .03, a: 2.5, r: 4 }));
+      });
+    },
+    rain(c, out, r) {
+      noiseSrc(c, out, [['highpass', 900], ['lowpass', 7000]], p => wobble(p, r, .22, .05, 2.5), 11);
+      noiseSrc(c, out, [['lowpass', 380]], p => wobble(p, r, .5, .3, 4), 23);
+      noiseSrc(c, out, [['bandpass', 1500, .7]], p => wobble(p, r, .06, .03, 3), 37);
+      for (let t = .3; t < LOOP - .5; t += .25 + r() * .9) tone(c, out, 1800 + r() * 2200, t, .02, { type: 'sine', g: .015 + r() * .02, a: .002, r: .09 });
+      [45, 52].forEach(m => tone(c, out, mtof(m), 0, LOOP - 6, { type: 'sine', g: .06, a: 6, r: 4 }));
+    },
+    lofi(c, out, r) {
+      const beat = 60 / 64, nb = Math.round(LOOP / beat), warm = c.createBiquadFilter(); warm.type = 'lowpass'; warm.frequency.value = 4800; warm.connect(out);
+      const hat = (t, g) => { const s = c.createBufferSource(); s.buffer = noiseBuf(c, .1, 5 + Math.floor(t * 10)); const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 6500; const gg = c.createGain(); gg.gain.setValueAtTime(g, t); gg.gain.exponentialRampToValueAtTime(.0005, t + .05); s.connect(hp); hp.connect(gg); gg.connect(warm); s.start(t); s.stop(t + .08); };
+      for (let b = 0; b < nb; b++) {
+        const t = b * beat, bar = Math.floor(b / 4), ch = CHORDS[Math.floor(bar / 4) % 4], bt = b % 4;
+        if (bt === 0 || bt === 2) { // bumbo suave
+          const o = c.createOscillator(), g = c.createGain(); o.frequency.setValueAtTime(130, t); o.frequency.exponentialRampToValueAtTime(45, t + .16);
+          g.gain.setValueAtTime(.38, t); g.gain.exponentialRampToValueAtTime(.001, t + .28); o.connect(g); g.connect(warm); o.start(t); o.stop(t + .3);
+          tone(c, warm, mtof(ch[0]), t, beat * 1.6, { type: 'triangle', g: .2, a: .01, r: .5, lp: 500 });
+        } else { // caixa suave
+          const s = c.createBufferSource(); s.buffer = noiseBuf(c, .2, 9 + b); const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1800; const g = c.createGain();
+          g.gain.setValueAtTime(.2, t); g.gain.exponentialRampToValueAtTime(.001, t + .16); s.connect(bp); bp.connect(g); g.connect(warm); s.start(t); s.stop(t + .2);
+        }
+        hat(t, .05); hat(t + beat * .5 + (r() * .03), .03);
+        if (bt === 0 || bt === 2) ch.forEach((m, k) => tone(c, warm, mtof(m + 12), t + k * .03, beat * 1.7, { type: 'sine', g: .07, a: .02, r: .9, lp: 2200, detune: (r() - .5) * 14 }));
+        if (bt === 1 && r() < .7) tone(c, warm, mtof(PENTA[Math.floor(r() * PENTA.length)] - 12), t + beat * .5, beat * .9, { type: 'triangle', g: .05, a: .01, r: .8, lp: 2600 });
+      }
+    }
+  };
+
+  const cache = {};
+  async function renderPreset(id, rate) {
+    const key = id + '@' + rate; if (cache[key]) return cache[key];
+    const total = Math.floor((LOOP + TAIL) * rate), c = new OfflineAudioContext(2, total, rate);
+    const dry = c.createGain(), wet = reverb(c, 3.4, 2.4, 7), wg = c.createGain(), comp = c.createDynamicsCompressor();
+    wg.gain.value = id === 'rain' ? .25 : .55; dry.connect(comp); dry.connect(wet); wet.connect(wg); wg.connect(comp); comp.connect(c.destination);
+    PRESET_FN[id](c, dry, rngOf(id.length * 977 + 13));
+    const rendered = await c.startRendering(), len = LOOP * rate, tail = total - len;
+    const buf = new AudioBuffer({ numberOfChannels: 2, length: len, sampleRate: rate });
+    let peak = 0;
+    for (let ch = 0; ch < 2; ch++) {
+      const src = rendered.getChannelData(ch), dst = buf.getChannelData(ch);
+      dst.set(src.subarray(0, len));
+      for (let i = 0; i < tail; i++) dst[i] += src[len + i];   // a "cauda" volta ao início: loop sem emenda
+      for (let i = 0; i < len; i++) peak = Math.max(peak, Math.abs(dst[i]));
+    }
+    const k = peak > 0 ? .7 / peak : 1;
+    for (let ch = 0; ch < 2; ch++) { const d = buf.getChannelData(ch); for (let i = 0; i < len; i++) d[i] *= k; }
+    return (cache[key] = buf);
+  }
+  async function getBuffer(rate) {
+    rate = rate || 48000;
+    if (state.preset === 'file') {
+      if (!fileBlob) fileBlob = await idbGet();
+      if (!fileBlob) throw new Error('Nenhum áudio enviado.');
+      const key = 'file@' + rate + '@' + fileBlob.size; if (cache[key]) return cache[key];
+      return (cache[key] = await new OfflineAudioContext(2, 1, rate).decodeAudioData(await fileBlob.arrayBuffer()));
+    }
+    return renderPreset(PRESET_FN[state.preset] ? state.preset : 'piano', rate);
+  }
+
+  /* ---------- reprodução ---------- */
+  let ac = null, master = null, src = null, playing = false, token = 0, preview = false;
+  const level = () => Math.pow(state.vol / 100, 1.6);
+  const status = msg => { const el = $('musicStatus'); if (el) el.textContent = msg; };
+  async function start() {
+    if (playing) return; playing = true; const my = ++token;
+    try {
+      if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination); }
+      if (ac.state === 'suspended') ac.resume().catch(() => {});
+      status('Preparando a música…');
+      const buf = await getBuffer(ac.sampleRate);
+      if (my !== token) return;
+      src = ac.createBufferSource(); src.buffer = buf; src.loop = true; src.connect(master); src.start();
+      master.gain.cancelScheduledValues(ac.currentTime); master.gain.setValueAtTime(master.gain.value, ac.currentTime);
+      master.gain.linearRampToValueAtTime(level(), ac.currentTime + 2);
+      status(ac.state === 'running' ? 'Tocando.' : 'Toque na tela uma vez para liberar o som.');
+    } catch (e) { playing = false; status('Não foi possível tocar: ' + (e.message || e)); }
+    refreshBtn();
+  }
+  function stop() {
+    if (!playing) return; playing = false; token++;
+    const s = src; src = null;
+    if (ac && master) { master.gain.cancelScheduledValues(ac.currentTime); master.gain.setValueAtTime(master.gain.value, ac.currentTime); master.gain.linearRampToValueAtTime(0, ac.currentTime + 1); }
+    if (s) setTimeout(() => { try { s.stop(); } catch (e) {} }, 1100);
+    status('Parada.'); refreshBtn();
+  }
+  function refreshBtn() { const b = $('musicPreviewBtn'); if (b) b.textContent = playing && preview ? '⏹ Parar' : '▶ Ouvir'; }
+  const unlock = () => { if (ac && ac.state === 'suspended') ac.resume().then(() => { if (playing) status('Tocando.'); }).catch(() => {}); };
+  ['pointerdown', 'keydown', 'touchstart'].forEach(e => window.addEventListener(e, unlock, { passive: true }));
+
+  // Música só na apresentação e nunca por cima do vídeo de abertura (ele tem o próprio som).
+  setInterval(() => {
+    const b = document.body, want = preview || (state.tv && b.classList.contains('tv-mode') && !b.classList.contains('intro-playing'));
+    if (want && !playing) start(); else if (!want && playing) stop();
+    if (playing && ac && ac.state === 'suspended') ac.resume().catch(() => {});
+  }, 400);
+
+  /* ---------- painel ---------- */
+  function init() {
+    if (!$('musicPreset')) return;
+    idbGet().then(b => { if (b) fileBlob = b; });
+    $('musicPreset').value = state.preset; $('musicVol').value = state.vol; $('musicTv').checked = !!state.tv; $('musicExp').checked = !!state.exp;
+    const volTxt = () => { $('musicVolVal').textContent = state.vol + '%'; }; volTxt();
+    const pickFile = () => $('musicFile').click();
+    const changed = () => { save(); if (playing) { const wasPreview = preview; stop(); setTimeout(() => { preview = wasPreview; if (wasPreview || (state.tv && document.body.classList.contains('tv-mode'))) start(); }, 1150); } };
+    $('musicPreset').addEventListener('change', async e => {
+      state.preset = e.target.value;
+      if (state.preset === 'file') { fileBlob = fileBlob || await idbGet(); if (!fileBlob) { pickFile(); return; } }
+      changed();
+    });
+    $('musicUploadBtn').addEventListener('click', pickFile);
+    $('musicFile').addEventListener('change', async e => {
+      const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+      fileBlob = f; const ok = await idbPut(f); state.preset = 'file'; $('musicPreset').value = 'file'; changed();
+      status('Áudio "' + f.name + '" ' + (ok ? 'salvo neste aparelho.' : 'carregado (só nesta sessão).') + ' Use somente músicas livres de direitos autorais.');
+    });
+    $('musicVol').addEventListener('input', e => { state.vol = +e.target.value; volTxt(); save(); if (playing && master) master.gain.setTargetAtTime(level(), ac.currentTime, .05); });
+    $('musicTv').addEventListener('change', e => { state.tv = e.target.checked; save(); });
+    $('musicExp').addEventListener('change', e => { state.exp = e.target.checked; save(); });
+    $('musicPreviewBtn').addEventListener('click', () => { if (playing && preview) { preview = false; stop(); } else { preview = true; if (playing) { refreshBtn(); } else start(); } refreshBtn(); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+
+  window.seseMusic = {
+    wantsExport: () => !!state.exp && (state.preset !== 'file' || !!fileBlob),
+    getBuffer: async rate => { if (state.preset === 'file' && !fileBlob) fileBlob = await idbGet(); return getBuffer(rate); },
+    volume: () => level()
+  };
+})();
+
 </script>
 </body>
 </html>
