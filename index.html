@@ -5648,7 +5648,55 @@ License: bitstream-vera
       if (!$('extraLayoutGroup')) return;
       buildThemePanel();
       buildEmojiPanel();
-      document.querySelectorAll('[data-layout]').forEach(button => button.addEventListener('click', () => setPageLayout(button.dataset.layout)));
+      document.querySelectorAll('[data-layout]').forEach(button => button.addEventListener('click', () => {
+        const kind = button.dataset.layout;
+        if (kind === 'text' && pageKind(current()) !== 'text') askTextLayoutChoice(); else setPageLayout(kind);
+      }));
+      // Texto livre numa página existente: pergunta se muda esta página ou cria uma nova logo depois dela.
+      function addTextPageAfterCurrent(atEnd) {
+        const change = projectHistoryBegin('criar página de texto livre');
+        const clone = structuredClone(current());
+        clone.id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        clone.title = 'NOVA PÁGINA';
+        clone.leftImage = ''; clone.rightImage = ''; clone.leftImages = []; clone.rightImages = [];
+        clone.leftAnnotations = []; clone.rightAnnotations = [];
+        clone.elements = '[]'; clone.floatImages = {}; clone.freeText = ''; clone.hidden = false;
+        const at = atEnd ? pages.length : currentPage + 1;
+        pages.splice(at, 0, clone);
+        currentPage = at;
+        projectHistoryCommit(change);
+        pages.forEach((page, i) => { page.number = String(i + 1); });
+        setPageLayout('text');
+        syncFormFromPage(); autoSaveProject();
+      }
+      function askTextLayoutChoice() {
+        document.getElementById('textChoiceDialog')?.remove();
+        const wrap = document.createElement('div');
+        wrap.id = 'textChoiceDialog'; wrap.setAttribute('role', 'alertdialog'); wrap.setAttribute('aria-modal', 'true');
+        wrap.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(5,10,20,.72)';
+        wrap.innerHTML = '<div style="max-width:440px;width:100%;background:#152131;color:#e7edf6;border:2px solid #f4bf12;border-radius:16px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.5);font-family:Montserrat,Arial,sans-serif">' +
+          '<h3 style="margin:0 0 8px;font-size:18px">⚠️ Você está prestes a mudar esta página</h3>' +
+          '<p style="margin:0 0 18px;font-size:14px;line-height:1.5;color:#c9d6e8">Deseja realmente mudar esta página para <strong>Texto livre</strong> ou criar uma nova página?</p>' +
+          '<div style="display:grid;gap:10px">' +
+          '<button type="button" data-choice="change" style="padding:12px;border-radius:10px;border:1px solid #fff3;background:#1d2d44;color:#fff;font:700 14px Montserrat,Arial,sans-serif;cursor:pointer">✏️ Mudar esta página</button>' +
+          '<button type="button" data-choice="new" style="padding:12px;border-radius:10px;border:0;background:#1465ea;color:#fff;font:700 14px Montserrat,Arial,sans-serif;cursor:pointer">➕ Criar uma nova página (logo depois desta)</button>' +
+          '<button type="button" data-choice="end" style="padding:12px;border-radius:10px;border:1px solid #fff3;background:#1d2d44;color:#fff;font:700 14px Montserrat,Arial,sans-serif;cursor:pointer">⏭️ Colocar nova página no final</button>' +
+          '<button type="button" data-choice="cancel" style="padding:10px;border-radius:10px;border:0;background:transparent;color:#9fb0c5;font:600 13px Montserrat,Arial,sans-serif;cursor:pointer">Cancelar</button>' +
+          '</div></div>';
+        const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey, true); };
+        const onKey = event => { if (event.key === 'Escape') { event.stopPropagation(); close(); } };
+        wrap.addEventListener('click', event => {
+          const choice = event.target.closest('[data-choice]')?.dataset.choice;
+          if (!choice && event.target !== wrap) return;
+          close();
+          if (choice === 'change') setPageLayout('text');
+          else if (choice === 'new') addTextPageAfterCurrent(false);
+          else if (choice === 'end') addTextPageAfterCurrent(true);
+        });
+        document.addEventListener('keydown', onKey, true);
+        document.body.appendChild(wrap);
+        wrap.querySelector('[data-choice="new"]').focus();
+      }
       document.querySelectorAll('[data-split-side]').forEach(button => button.addEventListener('click', () => setPageOpt('splitSide', button.dataset.splitSide, 'mudar lado da figura')));
       document.querySelectorAll('[data-align-btn]').forEach(button => button.addEventListener('click', () => setPageOpt('align', button.dataset.alignBtn, 'alinhar texto livre')));
       $('splitRatio').addEventListener('change', event => setPageOpt('splitRatio', event.target.value, 'mudar tamanho da figura'));
