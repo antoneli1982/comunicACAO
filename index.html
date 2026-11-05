@@ -6243,6 +6243,8 @@ const firebaseConfig = {
   <script>
 /* Shared project on Spark: no Storage, billing, authentication or expiry. */
 (() => {
+  // O HTML baixado usa o projeto incorporado e funciona sem conexão.
+  if (document.getElementById('seseEmbeddedProject')) return;
   const ROOT = 'regras_de_seguranca/projeto';
   const status = document.getElementById('syncStatus');
   const retry = document.getElementById('syncRetry');
