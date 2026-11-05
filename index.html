@@ -1796,6 +1796,7 @@ License: bitstream-vera
         </div>
           <button type="button" data-layout="split" aria-pressed="false"><span aria-hidden="true">🖼️📝</span>Figura + texto<small>tela dividida</small></button>
           <button type="button" data-layout="image" aria-pressed="false"><span aria-hidden="true">🖼️</span>Só figuras<small>tela inteira</small></button>
+          <button type="button" data-layout="video" aria-pressed="false"><span aria-hidden="true">🎬</span>Vídeo<small>neste slide</small></button>
 
 
         </div>
@@ -4989,12 +4990,13 @@ License: bitstream-vera
       compare:{icon:'✅',label:'Correto × Incorreto'},
       text:{icon:'📝',label:'Texto livre'},
       split:{icon:'◧',label:'Figura + texto'},
-      image:{icon:'🖼️',label:'Só figuras'}
+      image:{icon:'🖼️',label:'Só figuras'},
+      video:{icon:'🎬',label:'Vídeo'}
     };
     var PAGE_OPTS_DEFAULT = {align:'left',size:'m',valign:'center',box:'plain',splitSide:'left',splitRatio:'50'};
     var EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Segoe UI Symbol",sans-serif';
 
-    function pageLayout(page) { const l = page && page.layout; return EXTRA_LAYOUTS && EXTRA_LAYOUTS[l] ? l : 'compare'; }
+    function pageLayout(page) { if (window.seseIsVideoPage?.(page)) return 'video'; const l = page && page.layout; return EXTRA_LAYOUTS && EXTRA_LAYOUTS[l] ? l : 'compare'; }
     // Tipo de página como aparece no seletor (Correto × Incorreto, Só o correto, Só o incorreto...).
     var PAGE_KINDS = {
       compare:{icon:'✅❌',label:'Correto × Incorreto'},
@@ -5002,7 +5004,8 @@ License: bitstream-vera
       'only-incorrect':{icon:'❌',label:'Só o incorreto'},
       text:{icon:'📝',label:'Texto livre'},
       split:{icon:'◧',label:'Figura + texto'},
-      image:{icon:'🖼️',label:'Só figuras'}
+      image:{icon:'🖼️',label:'Só figuras'},
+      video:{icon:'🎬',label:'Vídeo'}
     };
     function pageKind(page) {
       const layout = pageLayout(page);
@@ -5011,8 +5014,8 @@ License: bitstream-vera
       if (page.showCorrect === false) return 'only-incorrect';
       return 'compare';
     }
-    function layoutIcon(page) { if (page.videoData) return '🎬'; return PAGE_KINDS ? PAGE_KINDS[pageKind(page)].icon : ''; }
-    function layoutLabel(page) { if (page.videoData) return 'Vídeo'; return PAGE_KINDS ? PAGE_KINDS[pageKind(page)].label : ''; }
+    function layoutIcon(page) { return PAGE_KINDS ? PAGE_KINDS[pageKind(page)].icon : ''; }
+    function layoutLabel(page) { return PAGE_KINDS ? PAGE_KINDS[pageKind(page)].label : ''; }
     function pageOpts(page) {
       let o = {};
       try { o = page && page.opts ? JSON.parse(page.opts) : {}; } catch (error) { o = {}; }
@@ -5131,7 +5134,7 @@ License: bitstream-vera
       applyTileBackgrounds(fit === 'blur');
       if (typeof refreshExtendedTiles === 'function') requestAnimationFrame(refreshExtendedTiles);
       slide.classList.toggle('fig-full', isFigureFullScreen(page));
-      ['compare', 'text', 'split', 'image'].forEach(name => slide.classList.toggle('layout-' + name, name === layout));
+      ['compare', 'text', 'split', 'image', 'video'].forEach(name => slide.classList.toggle('layout-' + name, name === layout));
       if (layout !== 'compare') slide.classList.remove('only-correct', 'only-incorrect');
       slide.classList.toggle('split-right', layout === 'split' && o.splitSide === 'right');
       const ratio = clampNum(parseInt(o.splitRatio, 10) || 50, 30, 70);
@@ -5159,6 +5162,7 @@ License: bitstream-vera
       const compareFamily = kind === 'compare' || kind === 'only-correct' || kind === 'only-incorrect';
       const layout = compareFamily ? 'compare' : kind;
       page.layout = layout;
+      page.opts = JSON.stringify({...pageOpts(page), videoEnabled:kind === 'video'});
       if (compareFamily) {
         page.showCorrect = kind !== 'only-incorrect';
         page.showIncorrect = kind !== 'only-correct';
@@ -5643,7 +5647,7 @@ License: bitstream-vera
       $('splitOptions').hidden = layout !== 'split';
       $('freeTextOptions').hidden = layout !== 'split';
       $('textLayoutOptions').hidden = layout !== 'text';
-      $('figureOptions').hidden = layout === 'text';
+      $('figureOptions').hidden = layout === 'text' || layout === 'video';
       $('figureFullRow').hidden = layout !== 'image';
       document.querySelectorAll('[data-split-side]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.splitSide === o.splitSide)));
       document.querySelectorAll('[data-align-btn]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.alignBtn === o.align)));
