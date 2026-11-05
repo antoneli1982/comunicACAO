@@ -8998,9 +8998,10 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
       }
     }
 
-    async function renderSlide(page, index, logoImg) {
-      const c = document.createElement('canvas'); c.width = W; c.height = H;
+    async function renderSlide(page, index, logoImg, scale = 1) {
+      const c = document.createElement('canvas'); c.width = W * scale; c.height = H * scale;
       const ctx = c.getContext('2d');
+      ctx.scale(scale, scale);
       FONT = typeof pageFontStack === 'function' ? pageFontStack(page) : BASE_FONT;
       const L = layout(ctx, page), T = L.T;
       const kind = typeof pageLayout === 'function' ? pageLayout(page) : 'compare';
@@ -9177,7 +9178,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
       if (!window.VideoEncoder || !window.VideoFrame || !window.Mp4Muxer) return null;
       let video = null;
       for (const [codec, mux] of [['avc1.640028', 'avc'], ['avc1.4d0028', 'avc'], ['avc1.42e028', 'avc'], ['vp09.00.40.08', 'vp9']]) {
-        const cfg = { codec, width: W, height: H, bitrate: 8000000, framerate: FPS, ...(mux === 'avc' ? { avc: { format: 'avc' } } : {}) };
+        const cfg = { codec, width: W, height: H, bitrate: 24000000, framerate: FPS, ...(mux === 'avc' ? { avc: { format: 'avc' } } : {}) };
         try { if ((await VideoEncoder.isConfigSupported(cfg)).supported) { video = { cfg, mux }; break; } } catch {}
       }
       if (!video) return null;
@@ -9192,6 +9193,15 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     }
 
     async function exportVideo(openingFile) {
+      const scale = document.getElementById('mp4Quality')?.value === '4k' ? 2 : 1;
+      if (window.seseExportQualityMp4) {
+        let logoImg = null;
+        const list = exportPages().map(page => ({...page}));
+        const handled = await window.seseExportQualityMp4({openingFile, list, say, done, download, seconds:intervalSeconds(), W:W*scale, H:H*scale, pickCodecs,
+          renderPage:async (page, index) => { await prepareFonts(); if (!logoImg) logoImg = await loadImage(list[0]?.logo || defaultLogo); return renderSlide(page, index, logoImg, scale); }});
+        if (handled) return;
+      }
+      if (scale > 1) { alert('A exportação 4K não está disponível neste navegador. Selecione Full HD com nitidez máxima ou use Chrome/Edge atualizado.'); return; }
       if (exportPages().some(page => window.seseIsVideoPage?.(page))) return window.seseExportVideoPages({openingFile, list:exportPages(), renderAll, say, done, download, seconds:intervalSeconds(), W, H});
       const music = !!(window.seseMusic && seseMusic.wantsExport());
       const codecs = await pickCodecs(!!openingFile || music);
@@ -9390,7 +9400,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
           dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
         }
 
-        const rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 8000000, audioBitsPerSecond: 160000 });
+        const rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 24000000, audioBitsPerSecond: 160000 });
         const chunks = [];
         rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
         const stopped = new Promise(r => { rec.onstop = r; });
@@ -9647,6 +9657,14 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     pptDialog.innerHTML = `
       <h2 id="pptTitle" style="margin:0 0 8px;font-size:20px;color:#153c72"></h2>
       <p id="pptIntro" style="margin:0 0 16px;font-size:14px;line-height:1.5;color:#475569"></p>
+      <div id="mp4QualityBox" style="margin:0 0 16px">
+        <label for="mp4Quality" style="display:block;font-size:14px;margin-bottom:6px">Qualidade da imagem</label>
+        <select id="mp4Quality" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:white;color:#172638">
+          <option value="fullhd">Full HD — nitidez máxima</option>
+          <option value="4k">4K — para TV 4K e imagens em alta resolução</option>
+        </select>
+        <p style="font-size:12px;color:#475569;margin:6px 0 0">Prioriza detalhes e letras. A qualidade maior pode aumentar o tamanho do arquivo.</p>
+      </div>
       <label style="display:flex;gap:8px;align-items:center;color:#172638;font-size:14px;margin:0 0 10px"><input type="checkbox" id="pptWithVideo" checked> Incluir o vídeo de abertura</label>
       <div id="pptVideoBox" style="background:#f1f5f9;border-radius:12px;padding:12px;font-size:13px;line-height:1.5">
         <div id="pptVideoStatus" style="margin-bottom:8px"></div>
@@ -9681,6 +9699,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     async function openExportDialog(mode) {
       dialogMode = mode;
       const mp4 = mode === 'mp4';
+      document.getElementById('mp4QualityBox').hidden = !mp4;
       document.getElementById('pptTitle').textContent = mp4 ? 'Apresentação completa em MP4' : 'Exportar para PowerPoint';
       document.getElementById('pptIntro').textContent = mp4
         ? `Gera um único vídeo MP4: primeiro a abertura (com som), depois todas as ${pages.filter(p => !isPageHidden(p)).length} páginas visíveis, ${intervalSeconds()} s cada, com transição suave. A gravação acontece em tempo real; deixe esta aba aberta e visível até terminar.`
