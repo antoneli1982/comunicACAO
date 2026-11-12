@@ -8972,7 +8972,13 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
           const pad = box !== 'plain' ? fs * .6 : el.bg ? fs * .35 : 0;
           const bar = box === 'card' ? fs * .25 : 0, border = box === 'outline' ? fs * .12 : 0;
           ctx.font = `${el.bold === false ? 600 : 800} ${fs}px ${el.font && typeof fontStack === 'function' ? fontStack(el.font) : FONT}`;
-          const lines = wrap(ctx, el.text, w - pad * 2 - bar - border * 2), lh = fs * 1.2, h = lines.length * lh + pad * 2 + border * 2;
+          const textWidth = Math.max(1, w - pad * 2 - bar - border * 2);
+          // Keep paragraph endings so justification never stretches headings or last lines.
+          const lines = String(el.text || '').split('\n').flatMap(par => {
+            const wrapped = wrap(ctx, par, textWidth);
+            return wrapped.map((text, index) => ({ text, last: index === wrapped.length - 1 }));
+          });
+          const lh = fs * 1.2, h = lines.length * lh + pad * 2 + border * 2;
           const radius = Math.min(fs * .3, h / 2);
           ctx.save();
           if (box === 'card') {
@@ -8989,10 +8995,26 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
           ctx.restore();
           ctx.fillStyle = box === 'accent' ? T.onPrimary : (el.color || T.text); ctx.textBaseline = 'middle';
           const align = el.align || 'center';
-          ctx.textAlign = align;
+          // Canvas does not support textAlign='justify'; assigning it retains stale alignment.
+          ctx.textAlign = align === 'right' ? 'right' : align === 'center' ? 'center' : 'left';
           const left = -w / 2 + bar + border + pad, right = w / 2 - border - pad;
-          const x = align === 'left' ? left : align === 'right' ? right : (left + right) / 2;
-          lines.forEach((line, i) => ctx.fillText(line, x, -h / 2 + border + pad + i * lh + lh / 2));
+          const x = align === 'right' ? right : align === 'center' ? (left + right) / 2 : left;
+          ctx.save();
+          ctx.beginPath(); ctx.rect(left, -h / 2, textWidth, h); ctx.clip();
+          lines.forEach((line, i) => {
+            const y = -h / 2 + border + pad + i * lh + lh / 2;
+            const words = line.text.split(/\s+/).filter(Boolean);
+            if (align === 'justify' && !line.last && words.length > 1) {
+              const wordsWidth = words.reduce((sum, word) => sum + ctx.measureText(word).width, 0);
+              const gap = (textWidth - wordsWidth) / (words.length - 1);
+              let cursor = left;
+              words.forEach(word => { ctx.fillText(word, cursor, y); cursor += ctx.measureText(word).width + gap; });
+            } else {
+              // Also constrain a single oversized word to the available box width.
+              ctx.fillText(line.text, x, y, textWidth);
+            }
+          });
+          ctx.restore();
         }
         ctx.restore();
       }
