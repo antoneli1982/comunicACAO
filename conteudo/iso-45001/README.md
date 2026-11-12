@@ -1,7 +1,8 @@
-# ISO 45001 — slides 87 a 94
+# ISO 45001 — slides 49 a 56
 
 Conteúdo da sequência publicada no projeto compartilhado em 12/11/2026.
-Cada página mantém o folder original à esquerda e três caixas de texto à direita.
+Cada página mantém o folder original à esquerda e três caixas de texto justificado à direita.
+A sequência foi movida para antes dos antigos slides 49 a 86, agora numerados de 57 a 94.
 
 1. Política de SSO
 2. Nossos compromissos
