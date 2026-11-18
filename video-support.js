@@ -388,3 +388,60 @@ window.seseExportQualityMp4 = async ({ openingFile, list, renderPage, say, done,
   }
   return true;
 };
+
+/* Move o slide selecionado para uma posição da lista em uma única edição. */
+(() => {
+  const list = document.getElementById('pagesList');
+  if (!list || document.getElementById('slideMoveForm')) return;
+  const form = document.createElement('form');
+  form.id = 'slideMoveForm';
+  form.innerHTML = `
+    <label for="slideMovePosition"></label>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input id="slideMovePosition" type="number" min="1" step="1" required
+        inputmode="numeric" style="flex:1;min-width:0">
+      <button type="submit" class="primary">Mover</button>
+    </div>
+    <span class="hint" role="status"></span>`;
+  list.before(form);
+  const input = form.querySelector('input');
+  const label = form.querySelector('label');
+  const status = form.querySelector('[role="status"]');
+  let lastSlide;
+  function refresh() {
+    const slide = pages[currentPage];
+    if (slide !== lastSlide) {
+      input.value = '';
+      status.textContent = '';
+      lastSlide = slide;
+    }
+    input.max = String(pages.length);
+    label.textContent = 'Mover slide ' + (currentPage + 1) + ' para a posição';
+  }
+  new MutationObserver(refresh).observe(list, {childList:true});
+  refresh();
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const destination = input.valueAsNumber - 1;
+    if (!Number.isInteger(destination) || destination < 0 || destination >= pages.length) {
+      input.max = String(pages.length);
+      input.reportValidity();
+      return;
+    }
+    if (destination === currentPage) {
+      status.textContent = 'Este slide já está nessa posição.';
+      return;
+    }
+    const change = projectHistoryBegin('reordenar páginas');
+    const [slide] = pages.splice(currentPage, 1);
+    pages.splice(destination, 0, slide);
+    currentPage = destination;
+    syncPageNumbers();
+    projectHistoryCommit(change);
+    syncFormFromPage();
+    autoSaveProject();
+    if (typeof scheduleCloudSave === 'function') scheduleCloudSave();
+    input.value = '';
+    status.textContent = 'Slide movido para a posição ' + (destination + 1) + '.';
+  });
+})();
