@@ -5760,8 +5760,8 @@ License: bitstream-vera
           if (!choice && event.target !== wrap) return;
           close();
           if (choice === 'change') setPageLayout('text');
-          else if (choice === 'new') { if (window.seseOpenNewPage) window.seseOpenNewPage({kind:'text', position:'after'}); else addTextPageAfterCurrent(false); }
-          else if (choice === 'end') { if (window.seseOpenNewPage) window.seseOpenNewPage({kind:'text', position:'end'}); else addTextPageAfterCurrent(true); }
+          else if (choice === 'new') addTextPageAfterCurrent(false);
+          else if (choice === 'end') addTextPageAfterCurrent(true);
         });
         document.addEventListener('keydown', onKey, true);
         document.body.appendChild(wrap);
@@ -9964,28 +9964,11 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
   .np-kinds button[aria-checked="true"]{border-color:#f4bf12;background:#2a3b18;box-shadow:0 0 0 3px rgba(244,191,18,.25)}
   .np-kinds button:focus-visible,.np-themes button:focus-visible{outline:3px solid #4fa3ff;outline-offset:2px}
   .np-novideo{margin:8px 0 0;font-size:11.5px;color:#9fb0c5}
-  .np-feat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-  .np-feat .feat,.np-more .feat{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;background:none;border:0;padding:0;cursor:pointer;color:#e7edf6;min-height:0;height:auto;box-shadow:none;transform:none}
-  .np-sw{display:block;width:100%;height:62px;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.16);background:var(--bg);position:relative}
-  .np-sw::before{content:"";position:absolute;left:0;right:0;top:10px;height:15px;background:var(--pri)}
-  .np-sw::after{content:"";position:absolute;left:10px;width:55%;bottom:11px;height:7px;border-radius:4px;background:var(--txt);opacity:.6}
-  .np-feat .feat b{font-size:13px;font-weight:800;line-height:1.15;text-align:center;overflow-wrap:anywhere}
-  .np-more{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px 8px;margin-top:10px}
-  .np-more .np-sw{height:40px}.np-more .np-sw::before{top:6px;height:10px}.np-more .np-sw::after{bottom:7px;height:5px;left:6px}
-  .np-more .feat b{font-size:10.5px;font-weight:700;text-align:center;line-height:1.2}
-  .feat[aria-checked="true"] .np-sw{border-color:#f4bf12;box-shadow:0 0 0 3px #f4bf12}
-  .feat[aria-checked="true"] b{color:#f4bf12}
-  .feat:focus-visible{outline:3px solid #4fa3ff;outline-offset:3px;border-radius:12px}
-  .np-toggle{margin-top:10px;background:none!important;border:0!important;color:#9fc3ff!important;font:700 12px Montserrat,Arial,sans-serif;cursor:pointer;padding:0!important;min-height:0!important;height:auto!important;box-shadow:none!important}
-  .np-custom{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:12px}
-  .np-custom label{display:flex!important;align-items:center;gap:6px;margin:0!important}
-  .np-custom input[type=color]{width:38px;height:30px;padding:0;border:1px solid rgba(255,255,255,.3);border-radius:6px;background:none}
-  .np-fonts{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
-  .np-fonts button{padding:10px;border-radius:12px;border:2px solid rgba(255,255,255,.14);background:#f6f8fb;color:#14283f;cursor:pointer;text-align:left;min-height:0;height:auto;box-shadow:none;transform:none}
-  .np-fonts button span{display:block;font-size:20px;line-height:1.1}
-  .np-fonts button small{display:block;font:600 11px Montserrat,Arial,sans-serif;color:#475569;margin-top:4px}
-  .np-fonts button[aria-checked="true"]{border-color:#f4bf12;box-shadow:0 0 0 3px #f4bf12}
-  .np-fonts button:focus-visible{outline:3px solid #4fa3ff;outline-offset:2px}
+  .np-themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:7px}
+  .np-themes button{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:10px;border:2px solid rgba(255,255,255,.12);background:#1d2d44;color:#e7edf6;cursor:pointer;font:600 11px Montserrat,Arial,sans-serif;text-align:left;min-height:0;height:auto;box-shadow:none;transform:none}
+  .np-themes button i{flex:none;width:26px;height:20px;border-radius:5px;border:1px solid rgba(255,255,255,.35);position:relative;overflow:hidden}
+  .np-themes button i::before{content:"";position:absolute;left:0;right:0;top:0;height:7px;background:var(--pri)}
+  .np-themes button[aria-checked="true"]{border-color:#f4bf12;background:#2a3b18}
   .np-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   #newPageDialog label{display:block;font-size:12px;font-weight:700;color:#cfdbea;margin:0 0 5px}
   #newPageDialog select,#newPageDialog input[type=text]{width:100%;box-sizing:border-box;padding:9px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#0f1b2d;color:#fff;font:500 13px Montserrat,Arial,sans-serif;margin:0}
@@ -10001,28 +9984,22 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
   .np-foot button{padding:11px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#1d2d44;color:#fff;font:700 14px Montserrat,Arial,sans-serif;cursor:pointer;min-height:0;height:auto}
   .np-foot button.np-go{background:#1465ea;border-color:#1465ea}
   .np-foot button:disabled{opacity:.45;cursor:not-allowed}
-  @media (max-width:640px){.np-feat{grid-template-columns:repeat(2,minmax(0,1fr))}.np-kinds{grid-template-columns:repeat(2,minmax(0,1fr))}.np-row{grid-template-columns:1fr}#newPageDialog .np-head,#newPageDialog .np-body,.np-foot{padding-left:14px;padding-right:14px}}`;
+  @media (max-width:640px){.np-kinds{grid-template-columns:repeat(2,minmax(0,1fr))}.np-row{grid-template-columns:1fr}#newPageDialog .np-head,#newPageDialog .np-body,.np-foot{padding-left:14px;padding-right:14px}}`;
   const style = document.createElement('style'); style.id = 'seseNewPageStyles'; style.textContent = css; document.head.appendChild(style);
 
   const dialog = document.createElement('dialog');
   dialog.id = 'newPageDialog'; dialog.setAttribute('aria-labelledby', 'newPageTitle');
   dialog.innerHTML = `<form method="dialog">
-    <div class="np-head"><h2 id="newPageTitle">➕ Nova página</h2><p>A página nasce vazia, sem copiar nada da página selecionada. Escolha o tipo de layout, as cores e a fonte.</p></div>
+    <div class="np-head"><h2 id="newPageTitle">➕ Nova página</h2><p>Escolha o tipo de layout, as cores e a fonte. A página nasce limpa, sem fotos nem vídeo.</p></div>
     <div class="np-body">
       <h3>1. Tipo de layout <small>(obrigatório)</small></h3>
       <div class="np-kinds" role="radiogroup" aria-label="Tipo de layout da nova página">${KINDS.map(k => `<button type="button" role="radio" aria-checked="false" data-kind="${k.id}"><span class="ic" aria-hidden="true">${k.icon}</span><b>${esc(k.label)}</b><small>${esc(k.hint)}</small></button>`).join('')}</div>
       <p class="np-novideo">🎬 Páginas de vídeo não são criadas aqui: crie a página e, se precisar, mude para “Vídeo” em Tipo de página.</p>
-      <h3>2. Cores e fontes do layout <small>(obrigatório)</small></h3>
-      <div class="np-feat" role="radiogroup" aria-label="Cores em destaque" id="npFeat"></div>
-      <button type="button" class="np-toggle" id="npMoreBtn" aria-expanded="false">+ Outras cores</button>
-      <div id="npMoreBox" hidden>
-        <div class="np-more" role="radiogroup" aria-label="Outras paletas de cores" id="npMore"></div>
-        <div class="np-custom"><strong>🎨 Personalizada:</strong><label>Cor principal <input type="color" id="npCustomPri" value="#1465ea"></label><label>Fundo <input type="color" id="npCustomBg" value="#ffffff"></label><button type="button" class="np-toggle" id="npCustomUse">Usar estas cores</button></div>
-      </div>
-      <h3>3. Fonte <small>(obrigatório)</small></h3>
-      <div class="np-fonts" role="radiogroup" aria-label="Fonte da página" id="npFonts"></div>
-      <div class="np-row" style="margin-top:10px">
-        <div><label for="npFont">Mais fontes (Google Fonts e do aparelho)</label><select id="npFont"></select></div>
+      <h3>2. Cores</h3>
+      <div class="np-themes" role="radiogroup" aria-label="Cores da nova página" id="npThemes"></div>
+      <h3>3. Fonte e título</h3>
+      <div class="np-row">
+        <div><label for="npFont">Fonte da página</label><select id="npFont"></select></div>
         <div><label for="npTitleInput">Título (opcional)</label><input type="text" id="npTitleInput" maxlength="80" placeholder="Ex.: USO DE PROTETOR AURICULAR"></div>
       </div>
       <h3>4. Posição</h3>
@@ -10037,29 +10014,17 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
   </form>`;
   document.body.appendChild(dialog);
 
-  const state = {kind:null, theme:null, font:null, onDone:null};
-  const featured = () => (typeof FEATURED_THEMES !== 'undefined' ? FEATURED_THEMES : [['verde','Segurança'],['rosa','RH'],['contraste','Planejamento e Manutenção'],['qualidade','Qualidade']]);
-  const fontCards = () => [''].concat(typeof BUILTIN_FONTS !== 'undefined' ? BUILTIN_FONTS.filter(f => f !== 'Montserrat') : ['Poppins']);
+  const state = {kind:null, theme:'sese', font:'', onDone:null};
   const kindBtns = () => dialog.querySelectorAll('[data-kind]');
-  function swatch(t, label) {
-    const txt = (t.extra && t.extra.text) || textOn(t.bg);
-    return `<button type="button" class="feat" role="radio" aria-checked="false" data-np-theme="${esc(t.id)}" title="${esc(t.name)}"><span class="np-sw" style="--pri:${esc(t.primary)};--bg:${esc(t.bg)};--txt:${esc(txt)}"></span><b>${esc(label || t.name)}</b></button>`;
-  }
   function renderThemes() {
-    const feat = featured(), ids = feat.map(f => f[0]);
-    byId('npFeat').innerHTML = feat.map(([id, label]) => { const t = themes().find(x => x.id === id); return t ? swatch(t, label) : ''; }).join('');
-    const more = themes().filter(t => !ids.includes(t.id));
-    if (String(state.theme || '').startsWith('custom:')) more.push({id:state.theme, name:'Personalizada', ...themeColors(state.theme)});
-    byId('npMore').innerHTML = more.map(t => swatch(t)).join('');
-  }
-  function renderFonts() {
-    let stack = n => n ? '"' + n + '", Montserrat, sans-serif' : 'Montserrat, Arial, sans-serif';
-    try { stack = fontStack; } catch (e) {}
-    byId('npFonts').innerHTML = fontCards().map(f => `<button type="button" role="radio" aria-checked="false" data-np-font="${esc(f)}"><span style="font-family:${esc(stack(f))}">Aa Bb 123</span><small>${esc(f || 'Montserrat (padrão)')}</small></button>`).join('');
+    const box = byId('npThemes');
+    const list = themes().slice();
+    if (String(state.theme).startsWith('custom:')) list.push({id:state.theme, name:'Personalizada (atual)', ...themeColors(state.theme)});
+    box.innerHTML = list.map(t => `<button type="button" role="radio" aria-checked="${t.id === state.theme}" data-np-theme="${esc(t.id)}" title="${esc(t.name)}"><i style="--pri:${esc(t.primary)};background:${esc(t.bg)}"></i><span>${esc(t.name)}</span></button>`).join('');
   }
   function renderPreview() {
-    const t = themeColors(state.theme || 'sese'), txt = (t.extra && t.extra.text) || textOn(t.bg);
-    let fam = 'Montserrat, Arial, sans-serif'; try { fam = fontStack(state.font || ''); } catch (e) {}
+    const t = themeColors(state.theme), txt = textOn(t.bg);
+    let fam = 'Montserrat, Arial, sans-serif'; try { fam = fontStack(state.font); } catch (e) {}
     const title = (byId('npTitleInput').value.trim() || 'NOVA PÁGINA').toUpperCase();
     const k = state.kind || 'compare';
     const bars = '<div class="pv-lines"><i style="width:90%"></i><i style="width:70%"></i><i style="width:80%"></i></div>';
@@ -10072,27 +10037,21 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
       image:'<div class="pv-body" style="grid-template-columns:1fr 1fr 1fr"><div class="pv-box">🖼️</div><div class="pv-box">🖼️</div><div class="pv-box">🖼️</div></div>'
     }[k];
     const pv = byId('npPreview');
-    pv.style.background = t.bg; pv.style.color = txt; pv.style.fontFamily = fam; pv.style.opacity = (state.kind && state.theme && state.font !== null) ? '1' : '.6';
-    const hex = String(t.primary).replace('#', ''), full = hex.length === 3 ? hex.split('').map(c => c + c).join('') : hex;
-    const [r, g, b2] = [0, 2, 4].map(i => parseInt(full.slice(i, i + 2), 16) || 0);
-    const barText = (0.299 * r + 0.587 * g + 0.114 * b2) > 160 ? '#14283f' : '#fff';
+    pv.style.background = t.bg; pv.style.color = txt; pv.style.fontFamily = fam; pv.style.opacity = state.kind ? '1' : '.55';
+    const barText = /^#?f{3,6}$/i.test(String(t.primary).replace('#', '')) ? '#14283f' : '#fff';
     pv.innerHTML = `<div class="pv-bar" style="background:${esc(t.primary)};color:${barText}">${esc(title)}</div>${body}`;
   }
   function update() {
     kindBtns().forEach(b => b.setAttribute('aria-checked', String(b.dataset.kind === state.kind)));
     dialog.querySelectorAll('[data-np-theme]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.npTheme === state.theme)));
-    dialog.querySelectorAll('[data-np-font]').forEach(b => b.setAttribute('aria-checked', String(state.font !== null && b.dataset.npFont === state.font)));
-    const sel = byId('npFont'); if (state.font !== null && !fontCards().includes(state.font)) sel.value = state.font; else sel.value = '__none';
-    const missing = [!state.kind && 'o tipo de layout', !state.theme && 'as cores', state.font === null && 'a fonte'].filter(Boolean);
-    byId('npCreate').disabled = missing.length > 0;
-    const k = KINDS.find(x => x.id === state.kind), t = state.theme ? themeColors(state.theme) : null;
-    byId('npMsg').textContent = missing.length ? 'Falta escolher ' + missing.join(', ').replace(/, ([^,]*)$/, ' e $1') + '.' : `${k.label} · ${t.name || 'cores'} · ${state.font || 'Montserrat'}`;
+    byId('npCreate').disabled = !state.kind;
+    const k = KINDS.find(x => x.id === state.kind), t = themeColors(state.theme);
+    byId('npMsg').textContent = state.kind ? `${k.label} · ${t.name || 'cores'} · ${state.font || 'Montserrat'}` : 'Escolha o tipo de layout.';
     renderPreview();
   }
   dialog.addEventListener('click', e => {
     const k = e.target.closest('[data-kind]'); if (k) { state.kind = k.dataset.kind; update(); return; }
-    const t = e.target.closest('[data-np-theme]'); if (t) { state.theme = t.dataset.npTheme; update(); return; }
-    const f = e.target.closest('[data-np-font]'); if (f) { state.font = f.dataset.npFont; update(); }
+    const t = e.target.closest('[data-np-theme]'); if (t) { state.theme = t.dataset.npTheme; update(); }
   });
   dialog.addEventListener('keydown', e => {
     // Setas dentro do grupo de tipos, como um grupo de rádio.
@@ -10101,32 +10060,33 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     const next = list[(i + (e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1) + list.length) % list.length];
     next.focus(); state.kind = next.dataset.kind; update();
   });
-  byId('npFont').addEventListener('change', e => { if (e.target.value !== '__none') { state.font = e.target.value; update(); } });
-  byId('npMoreBtn').addEventListener('click', () => { const box = byId('npMoreBox'); box.hidden = !box.hidden; byId('npMoreBtn').setAttribute('aria-expanded', String(!box.hidden)); byId('npMoreBtn').textContent = box.hidden ? '+ Outras cores' : '− Menos cores'; });
-  byId('npCustomUse').addEventListener('click', () => { state.theme = 'custom:' + byId('npCustomPri').value + ':' + byId('npCustomBg').value; renderThemes(); update(); });
+  byId('npFont').addEventListener('change', e => { state.font = e.target.value; update(); });
   byId('npTitleInput').addEventListener('input', renderPreview);
   byId('npCancel').addEventListener('click', () => dialog.close());
 
   function createPage(kind, theme, font, title, after) {
     const base = current();
     const change = projectHistoryBegin('criar página');
-    // Modelo vazio: nada é copiado da página selecionada (só o logo da empresa).
+    const page = structuredClone(base);
+    ['videoData','videoName','videoPoster','videoDuration','videoUrl','videoSrc','video'].forEach(key => { delete page[key]; });
+    page.id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    page.title = title ? String(title).trim().toUpperCase() : 'NOVA PÁGINA';
+    page.leftImage = ''; page.rightImage = ''; page.leftImages = []; page.rightImages = [];
+    page.leftAnnotations = []; page.rightAnnotations = []; page.leftPhotoTransforms = []; page.rightPhotoTransforms = [];
+    page.elements = '[]'; page.floatImages = {}; page.freeText = ''; page.hidden = false; page.showNumber = true;
+    // Tipo escolhido — nunca vídeo.
     const compareFamily = kind === 'compare' || kind === 'only-correct' || kind === 'only-incorrect';
-    const page = {
-      id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
-      number: '', title: title ? String(title).trim().toUpperCase() : 'NOVA PÁGINA',
-      leftHeading: 'MODO CORRETO', rightHeading: 'MODO INCORRETO', okLabel: 'OK', nokLabel: 'NOK', confidential: '',
-      logo: (base && base.logo) || (typeof defaultLogo !== 'undefined' ? defaultLogo : ''),
-      leftImage: '', rightImage: '', leftImages: [], rightImages: [],
-      leftAnnotations: [], rightAnnotations: [], leftPhotoTransforms: [], rightPhotoTransforms: [],
-      showCorrect: kind !== 'only-incorrect', showIncorrect: kind !== 'only-correct',
-      layout: compareFamily ? 'compare' : kind,           // nunca vídeo
-      opts: JSON.stringify({videoEnabled:false}),
-      elements: '[]', floatImages: {}, freeText: '', hidden: false, showNumber: true,
-      theme: !theme || theme === 'sese' ? '' : theme, font: font || '', fonts: {}
-    };
+    page.layout = compareFamily ? 'compare' : kind;
+    let opts = {}; try { opts = JSON.parse(page.opts || '{}') || {}; } catch (e) { opts = {}; }
+    delete opts.fit; delete opts.full;
+    opts.videoEnabled = false;
+    page.opts = JSON.stringify(opts);
+    page.showCorrect = kind !== 'only-incorrect';
+    page.showIncorrect = kind !== 'only-correct';
     if (kind === 'split') page.freeText = 'Explique aqui o que a figura mostra.';
     if (kind === 'text' && typeof pageTextBox === 'function') page.elements = JSON.stringify([pageTextBox('Escreva aqui o texto desta página.\n• Arraste este texto para onde quiser\n• Crie outros textos com + Novo texto ✅', {cy:60})]);
+    page.theme = theme === 'sese' ? '' : theme;
+    page.font = font || '';
     if (typeof syncPageFonts === 'function') { try { syncPageFonts(page); } catch (e) {} }
     const at = after ? currentPage + 1 : pages.length;
     pages.splice(at, 0, page);
@@ -10158,18 +10118,18 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
 
   function open(opts = {}) {
     if (document.querySelector('.app')?.inert) return false;
+    const cur = current();
     state.kind = KINDS.some(k => k.id === opts.kind) ? opts.kind : null;
-    state.theme = opts.theme || null;
-    state.font = typeof opts.font === 'string' ? opts.font : null;
+    state.theme = opts.theme || String(cur?.theme || '') || 'sese';
+    state.font = opts.font ?? String(cur?.font || '');
     state.onDone = typeof opts.onDone === 'function' ? opts.onDone : null;
     const sel = byId('npFont');
-    try { sel.innerHTML = '<option value="__none">Escolher outra fonte…</option>' + fontOptionsHtml().replace(/<option value="">[^<]*<\/option>/, ''); }
-    catch (e) { sel.innerHTML = '<option value="__none">Escolher outra fonte…</option>'; }
+    try { sel.innerHTML = fontOptionsHtml(); } catch (e) { sel.innerHTML = '<option value="">Padrão (Montserrat)</option>'; }
+    if (state.font && ![...sel.options].some(o => o.value === state.font)) sel.add(new Option(state.font, state.font));
+    sel.value = state.font;
     byId('npTitleInput').value = opts.title ? String(opts.title).toUpperCase() : '';
-    dialog.querySelector(`input[name="npPos"][value="${opts.position === 'after' ? 'after' : 'end'}"]`).checked = true;
-    byId('npMoreBox').hidden = true; byId('npMoreBtn').textContent = '+ Outras cores'; byId('npMoreBtn').setAttribute('aria-expanded', 'false');
-    renderThemes(); renderFonts(); update();
-    if (state.theme && !featured().some(f => f[0] === state.theme)) { byId('npMoreBox').hidden = false; byId('npMoreBtn').textContent = '− Menos cores'; }
+    dialog.querySelector('input[name="npPos"][value="end"]').checked = true;
+    renderThemes(); update();
     dialog.showModal();
     (dialog.querySelector('[data-kind][aria-checked="true"]') || kindBtns()[0]).focus();
     return true;
@@ -10366,7 +10326,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
   function newPage(title, kind) {
     if (typeof window.seseOpenNewPage !== 'function') return '<p>Use o botão <b>+ Nova</b> em “Suas páginas”.</p>';
     window.seseOpenNewPage({title, kind, onDone: at => say(`<p>➕ Criei o ${slideRef(at)} como <b>${esc(kindLabel(kindOf(app().pages[at])))}</b>.</p>` + acts(nextSteps(at)))});
-    return `<p>Abri a janela <b>Nova página</b>${title ? ' com o título “' + esc(String(title).toUpperCase()) + '”' : ''}. Escolha:</p><ol><li><b>Tipo de layout</b>${kind ? ' (já marquei “' + esc(kindLabel(kind)) + '”)' : ''}: Correto × Incorreto, Só o correto, Só o incorreto, Texto livre, Figura + texto ou Só figuras</li><li><b>Cores e fontes do layout</b>: Segurança, RH, Planejamento e Manutenção, Qualidade ou outra paleta</li><li><b>Fonte</b> e posição</li></ol><p>A página nasce vazia (não copia a selecionada) e nunca como vídeo.</p>`;
+    return `<p>Abri a janela <b>Nova página</b>${title ? ' com o título “' + esc(String(title).toUpperCase()) + '”' : ''}. Escolha:</p><ol><li><b>Tipo de layout</b>${kind ? ' (já marquei “' + esc(kindLabel(kind)) + '”)' : ''}: Correto × Incorreto, Só o correto, Só o incorreto, Texto livre, Figura + texto ou Só figuras</li><li><b>Cores</b>: uma das ${themeList().length} paletas</li><li><b>Fonte</b> e posição</li></ol><p>Páginas novas nunca são criadas como vídeo.</p>`;
   }
   function nextSteps(at) {
     const k = kindOf(app().pages[at]);
@@ -10586,7 +10546,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     {k:['fotos para tv','jpg','zip','usb fotos','fotos da tv','tv sem navegador'], q:'Fotos para TV', a:'<p><b>Fotos para TV</b> gera um ZIP com um JPG por slide e um LEIA-ME. Extraia, copie a pasta <code>REGRAS_SESE</code> para o pen drive (FAT32 ou exFAT) e, na TV, abra USB › Fotos › REGRAS_SESE com repetição ligada.</p>', x:() => [act('🖼️ Gerar fotos', () => openExport('tvUsbPhotosBtn', 'fotos'), 'pri')]},
     {k:['pdf','imprimir','impressao'], q:'Exportar PDF', a:'<p>O ícone de documento na barra superior abre a impressão do navegador com o <b>slide atual</b>. Escolha “Salvar como PDF” como destino.</p>', x:() => [act('🖨 Abrir impressão', () => { byId('printBtn')?.click(); return ''; })]},
     {k:['backup','copia de seguranca','salvar backup','carregar backup','restaurar'], q:'Backup', a:'<p><b>Salvar backup</b> guarda uma cópia neste navegador. <b>Carregar backup</b> traz essa cópia de volta e <b>substitui o projeto compartilhado</b> para todos. Faça backup antes de mudanças grandes.</p>', x:() => [act('💾 Salvar backup agora', () => { byId('saveProjectBtn')?.click(); return '<p>Pedi o backup. Uma mensagem vai confirmar.</p>'; })]},
-    {k:['baixar html','baixe o html','html','html atualizado','offline','sem internet','arquivo html'], q:'Baixar HTML / usar sem internet', a:'<p><b>Baixar HTML atualizado</b> salva uma cópia do editor com o projeto dentro. Ela abre sem internet em “Modo local” e salva só no aparelho, sem sincronizar com os outros. Precisa de conexão no momento de baixar para incluir o suporte a vídeo.</p>'},
+    {k:['baixar html','html atualizado','offline','sem internet','arquivo html'], q:'Baixar HTML / usar sem internet', a:'<p><b>Baixar HTML atualizado</b> salva uma cópia do editor com o projeto dentro. Ela abre sem internet em “Modo local” e salva só no aparelho, sem sincronizar com os outros. Precisa de conexão no momento de baixar para incluir o suporte a vídeo.</p>'},
     {k:['sincroniz','nuvem','firebase','outro computador','outros aparelhos','compartilhad','tempo real','salva sozinho','salvo'], q:'Como funciona o salvamento?', a:'<p>Tudo salva sozinho: primeiro no aparelho, depois na nuvem, e os outros aparelhos recebem na hora. A barra azul no topo mostra o estado (“Salvo e sincronizado ✓”). Sem internet, as mudanças ficam guardadas e sobem quando a conexão voltar; mantenha a aba aberta.</p>'},
     {k:['desfazer','refazer','ctrl z','voltar atras','errei'], q:'Desfazer', a:'<p>Use <b>Desfazer</b> e <b>Refazer</b> no topo (Ctrl+Z / Ctrl+Y). Valem até 40 alterações nesta sessão. Recarregar a página ou receber mudanças de outro aparelho zera o histórico.</p>', x:() => [act('↶ Desfazer agora', () => { byId('projectUndoBtn')?.click(); return '<p>Feito.</p>'; })]},
     {k:['marcac','marcar','ponto na foto','ponto importante','seta','circulo','retangulo','destacar','apontar','desenhar','lupa','ampliar detalhe'], q:'Marcar pontos na foto', a:'<p>Passe o mouse na foto e clique em <b>✎</b>. No editor de marcações há seta, linha, retângulo, círculo, <b>lupa</b> (amplia um detalhe), texto, selos ✅/❌ e figura sobreposta. Escolha cor e espessura, desenhe e clique em aplicar. As marcações continuam editáveis.</p><p>Boa prática: <b>uma</b> seta ou círculo vermelho no ponto da regra.</p>'},
@@ -10600,7 +10560,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     {k:['elemento','arrastar','girar','opacidade','para frente','para tras','redimension'], q:'Mexer em figuras e textos livres', a:'<p>Clique no elemento para selecionar. Arraste para mover, a bolinha <b>↘</b> muda o tamanho e a <b>⟳</b> gira. O painel “Ajustar elemento selecionado” tem cor, fundo, fonte, opacidade, frente/trás, duplicar, centralizar e excluir. No teclado: setas movem, Delete apaga, Esc solta.</p>'},
     {k:['cor','cores','paleta','tema'], q:'Cores do layout', a:() => `<p>Em <b>Cores e fontes do layout</b> há ${themeList().length} paletas e uma personalizada (🎨). “Aplicar estas cores a todas as páginas” padroniza o conjunto. Posso aplicar: diga “cores segurança em todos”.</p>`, x:() => themeButtons()},
     {k:['fonte','letra','google fonts','tipografia'], q:'Fontes', a:'<p>Em <b>Cores e fontes do layout</b>, escolha a fonte da página, busque qualquer fonte do Google Fonts ou envie um arquivo (.ttf, .otf, .woff). As fontes ficam guardadas no projeto e funcionam sem internet. “Fonte em todas” aplica no conjunto.</p>'},
-    {k:['ocultar','oculto','oculta','esconder','escondo','nao aparecer','exibir na apresentacao','marcar exibir'], q:'Ocultar slides', a:'<p>Desmarque <b>Exibir</b> na lista (ou use “Ocultar este slide”). O slide fica guardado, mas não aparece na TV nem nas exportações e não recebe número. Posso fazer: “ocultar slide 3”.</p>'},
+    {k:['ocultar','esconder','nao aparecer','exibir na apresentacao','marcar exibir'], q:'Ocultar slides', a:'<p>Desmarque <b>Exibir</b> na lista (ou use “Ocultar este slide”). O slide fica guardado, mas não aparece na TV nem nas exportações e não recebe número. Posso fazer: “ocultar slide 3”.</p>'},
     {k:['reordenar','mudar ordem','ordem dos slides','arrastar slide','mover slide'], q:'Mudar a ordem', a:'<p>Na lista “Slides realizados”, use as setas <b>↑ ↓</b> ou arraste pela alça <b>⋮⋮</b>. A numeração acompanha a posição.</p>'},
     {k:['numero','numeracao','contagem'], q:'Numeração', a:'<p>O número é automático e segue a posição entre os slides visíveis. Para tirar de uma página, desmarque “Mostrar número nesta página”; a contagem pula essa página.</p>'},
     {k:['apresentar','apresentacao','tela cheia','modo tv','tv automatica','passar slides','teclado'], q:'Apresentar na TV', a:'<p><b>Apresentação</b> abre em tela cheia; avance com → ou espaço, volte com ←, Esc sai. O botão ▶ (TV automática) toca a abertura e troca os slides sozinho no intervalo escolhido, em ciclo.</p>', x:() => [act('▶ TV automática', () => { panelClose(); byId('autoTvBtn')?.click(); return ''; }, 'pri'), act('🖥 Apresentação manual', () => { panelClose(); byId('tvModeBtn')?.click(); return ''; })]},
@@ -10617,6 +10577,110 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     {k:['quantas fotos','quantas imagens','numero de fotos','quantidade de fotos','quantos slides','quantas paginas','tamanho do titulo','titulo ideal','titulo grande','quanto texto','quantas linhas','muito texto'], q:'Quantidades ideais', a:'<p><b>Referências para TV:</b></p><ul><li><b>Fotos:</b> 1 a 3 por lado (até 6 cabem, mas ficam pequenas).</li><li><b>Título:</b> até ~40 caracteres, em maiúsculas.</li><li><b>Texto:</b> até 5 linhas curtas.</li><li><b>Etiquetas:</b> no máximo 1 ou 2 por slide.</li><li><b>Slides por ciclo:</b> 8 a 15 (2 a 3 minutos).</li><li><b>Intervalo:</b> 10 s com fotos, 15 a 20 s com texto.</li></ul>', x:() => [act('🔎 Conferir meus slides', analysisHtml, 'pri')]},
     {k:['boas praticas','melhor pratica','dicas','como fazer um bom slide','padrao ideal','recomendac'], q:'Boas práticas', a:'<p><b>Boas práticas para TV</b></p><ul><li>Uma regra por slide; título até ~40 caracteres, em maiúsculas.</li><li>Correto × Incorreto: 1 a 3 fotos por lado, mesma cena, mudando só o comportamento.</li><li>Uma seta ou círculo no ponto da regra; lupa para detalhes pequenos.</li><li>Texto: até 5 linhas curtas, com ✅ e ⚠️.</li><li>No máximo 1 ou 2 etiquetas por slide.</li><li>Uma paleta de cores para todo o conjunto.</li><li>8 a 15 slides por ciclo; 10 s com fotos, 15 s com texto.</li><li>Fotos originais, nítidas e na horizontal.</li><li>Oculte (não apague) slides desatualizados.</li><li>Antes de exportar, confira em “Visualizar apresentação”.</li></ul>', x:() => [act('🔎 Analisar meus slides', analysisHtml, 'pri')]}
   ];
+  /* ---------------- Base de conhecimento ampliada (cobre todos os controles) ---------------- */
+  const KB_MORE = [
+    {k:['lado da figura','tamanho da figura','figura maior','figura menor','aumentar a figura','diminuir a figura','figura do lado','figura na esquerda','figura na direita','trocar o lado','proporcao da figura'], q:'Lado e tamanho da figura (Figura + texto)', a:'<p>Com a página no tipo <b>Figura + texto</b>, o bloco <b>Tipo de página</b> mostra:</p><ul><li><b>Lado da figura</b>: ◧ Esquerda ou Direita ◨.</li><li><b>Tamanho da figura</b>: quanto da tela a figura ocupa (35% a 65%); o texto fica com o resto.</li></ul>', w:{sel:'#splitOptions', tip:'Lado e tamanho da figura', kind:'split'}},
+    {k:['alinhar texto','alinhamento','centralizar texto','texto no centro','texto a esquerda','texto a direita','tamanho do texto','tamanho da letra do texto','posicao do texto','estilo do texto','caixa do texto','cartao com faixa','bloco colorido','com contorno','marcador','item','texto ao lado da figura'], q:'Formatar o texto ao lado da figura', a:'<p>Na página <b>Figura + texto</b>, abaixo de “Texto ao lado da figura”:</p><ul><li><b>• Marcador</b>, <b>✅ Item</b> e <b>⚠️ Item</b> põem o símbolo no início da linha.</li><li><b>Alinhamento</b>: ⯇ Esquerda, Centro, Direita ⯈.</li><li><b>Tamanho</b> da letra e <b>Posição</b> (centralizado ou no topo).</li><li><b>Estilo do texto</b>: Simples, Cartão com faixa, Bloco colorido ou Com contorno.</li></ul><p>Você também pode digitar direto no slide.</p>', w:{sel:'#freeTextOptions', tip:'Formatação do texto', kind:'split'}},
+    {k:['tela cheia','tela toda','tela inteira','ocupar o slide','slide inteiro','sem barra de titulo','sem titulo','figura grande','imagem grande'], q:'Figura em tela cheia', a:'<p>Use o tipo <b>Só figuras</b> e marque <b>“Tela cheia: a figura ocupa o slide inteiro, sem barra de título”</b>, no bloco Tipo de página. Para não cortar a figura, combine com o encaixe <b>Inteira</b> ou <b>Fundo estendido</b>.</p>', w:{sel:'#figureFullRow', tip:'Tela cheia', kind:'image'}},
+    {k:['titulo principal','titulo esquerdo','titulo direito','modo correto','modo incorreto','texto ok','texto nok','rotulo','estrutura da pagina','cabecalho','nome das colunas','escrito ok','escrito nok'], q:'Títulos e textos OK/NOK da página', a:'<p>No bloco <b>Estrutura da página</b> (aba Textos, no celular):</p><ul><li><b>Título principal</b>: a faixa do topo do slide.</li><li><b>Título esquerdo</b> e <b>Título direito</b>: “MODO CORRETO” e “MODO INCORRETO”.</li><li><b>Texto OK</b> e <b>Texto NOK</b>: as faixas de baixo de cada lado.</li></ul><p>No computador, também dá para clicar no texto do próprio slide e digitar.</p>', w:{sel:'#mainTitle', tip:'Estrutura da página: títulos e OK/NOK'}},
+    {k:['editar direto','digitar no slide','escrever no slide','clicar no titulo','editar titulo','mudar titulo','trocar titulo','mudar o nome','renomear','nome do slide'], q:'Editar o título', a:'<p>Há três jeitos:</p><ul><li>Clique no <b>título do slide</b> (na área do slide) e digite.</li><li>Na lista <b>Slides realizados</b>, clique no título para editar.</li><li>No bloco <b>Estrutura da página</b>, campo <b>Título principal</b>.</li></ul><p>Eu também faço: <code>título: USO DE LUVAS</code>.</p>', w:{sel:'#slideTitle', tip:'Clique e digite o título'}},
+    {k:['negrito','cor do texto','cor da letra','fundo do texto','com fundo','cor do tema','tamanho da letra','transparente','transparencia','opacidade','girar','rotacionar','inclinar','para frente','para tras','camada','na frente','atras','centralizar elemento','excluir elemento','duplicar elemento','fonte do elemento','texto livre','letra do texto livre','caixa de texto','emoji maior','figura livre'], q:'Ajustar a figura, o texto ou o emoji selecionado', a:'<p>Clique no elemento no slide: o bloco <b>Ajustar elemento selecionado</b> aparece com:</p><ul><li><b>Texto</b>, <b>Fonte</b> e <b>Estilo</b>.</li><li><b>Cor</b> (ou “Cor do tema”) e <b>Fundo</b> (marque “com fundo”).</li><li><b>N</b> (negrito) e alinhamento ⯇ ≡ ⯈.</li><li><b>Tamanho da letra</b>, <b>Tamanho</b>, <b>Girar</b> e <b>Opacidade</b> (transparência).</li><li>⬆ Para frente, ⬇ Para trás, ⧉ Duplicar, ⌖ Centralizar e 🗑 Excluir elemento.</li></ul>', w:{sel:['#floatPanelGroup','#floatGroup'], tip:'Clique num elemento do slide para abrir os ajustes', float:true}},
+    {k:['cor personalizada','minha cor','cor da empresa','cor principal','cor de fundo','fundo do slide','escolher cor','outra cor','cor propria'], q:'Cores personalizadas', a:'<p>Em <b>Cores e fontes do layout</b>, escolha a paleta <b>personalizada (🎨)</b>. Aparecem <b>Cor principal</b> e <b>Fundo</b> para escolher qualquer cor. Depois, “Aplicar estas cores a todas as páginas” padroniza o conjunto.</p>', w:{sel:['#themeCustomRow','#themeGrid','#extraThemeGroup'], tip:'Paletas e cor personalizada'}},
+    {k:['limpar imagens','tirar todas as fotos','apagar todas as fotos','remover todas as fotos','zerar fotos','limpar a pagina','limpar fotos'], q:'Limpar todas as imagens da página', a:'<p>Em <b>Suas páginas</b>, clique em <b>Limpar imagens</b>: tira todas as fotos da página atual (textos e título ficam). Se foi engano, use <b>Desfazer</b>.</p>', w:{sel:'#resetPageBtn', tip:'Limpar imagens'}},
+    {k:['ultima pagina','ultimo slide','final da lista','subir ao topo','voltar ao topo','topo do menu','rolar o menu','ir para o fim','ir para o final'], q:'Atalhos do menu lateral', a:'<p>No bloco <b>Projeto</b>, <b>Última página ↓</b> leva ao fim da lista. No final do menu, <b>Subir ao topo ↑</b> volta ao começo. Eu também levo você: “ir para o último slide”.</p>', w:{sel:'#lastSlideShortcut', tip:'Última página ↓'}, x:() => [act('⤓ Ir para o último slide', () => goTo(app().pages.length - 1), 'pri')]},
+    {k:['a partir deste slide','a partir de um slide','a partir do slide','comecar deste slide','comecar do slide','comecar de um slide','iniciar deste slide','iniciar do slide','apresentar deste'], q:'Apresentar a partir de um slide', a:'<p>Abra <b>👁 Visualizar apresentação</b> (à direita do slide), escolha o slide com ‹ › e clique em <b>▶ Apresentar a partir deste slide</b>.</p>', w:{sel:'#previewPlayBtn', tip:'▶ Apresentar a partir deste slide', open:() => { const pane = byId('previewPane'); if (pane && !visible(pane)) byId('previewTabBtn')?.click(); }}},
+    {k:['sair da tela cheia','fechar a apresentacao','sair do modo tv','durante a apresentacao','sair da apresentacao','pausar slide','manter fixo','slide fixo','avancar slide','voltar slide','setas','esc','pular video','pular abertura','pular a abertura','pular o video'], q:'Controles durante a apresentação (sair, pausar, pular)', a:'<p>Na apresentação em tela cheia:</p><ul><li><b>→</b> ou espaço avança, <b>←</b> volta, <b>Esc</b> ou <b>✕ Sair</b> fecha. Os botões ‹ › também trocam o slide.</li><li><b>⏸ Pausar slide</b> mantém o slide fixo na tela.</li><li>Durante a abertura, <b>Pular vídeo ›</b> vai direto aos slides.</li></ul>', w:{sel:'#tvModeBtn', tip:'Apresentação'}},
+    {k:['orientacao','deitado','horizontal','paisagem','vertical','girar o celular','retrato','em pe'], q:'Orientação no celular', a:'<p>Ao tocar em <b>Apresentação</b> no celular, aparece “Como deseja apresentar?”: <b>Paisagem</b> (deitado) ou <b>Manter posição atual</b>.</p>', w:{sel:'#tvModeBtn', tip:'Apresentação'}},
+    {k:['editor de marcacoes','ferramentas de marcacao','espessura','grossura','cor da seta','cor da marcacao','borda','selecionar formato','excluir formato','editar formato','aumentar formato','diminuir formato','limpar edicoes','aplicar marcacoes','editar marcacoes','linha','retangulo','circulo','seta'], q:'Editor de marcações (✎)', a:'<p>Passe o mouse na foto e clique em <b>✎</b>. No editor:</p><ul><li><b>Ferramentas</b>: ↖ Selecionar, ➜ Seta, ╱ Linha, □ Retângulo, ○ Círculo, Lupa, T Texto, Correto, Incorreto, Figura e ▧ Apagar antigas.</li><li><b>Cor</b> (Vermelho, Amarelo, Azul, Verde, Branco, Preto ou Outra cor), <b>Borda</b> (com ou sem cor) e <b>Espessura</b> em px.</li><li>Lista de formatos: <b>−</b> / <b>+</b> mudam o tamanho, <b>Editar formato</b> e <b>Excluir formato</b>.</li><li><b>↶ Desfazer</b> (Ctrl+Z), <b>↷ Refazer</b> (Ctrl+Shift+Z) e <b>Limpar edições</b>.</li><li>Zoom: roda do mouse ou − Zoom / + Zoom; <b>✋ Mover</b> (ou segure Espaço) e ⟲ Centralizar.</li><li>No fim, <b>Aplicar marcações</b>. Para mudar depois, clique no ✎ de novo.</li></ul>', w:{sel:['#leftGallery img','#rightGallery img','#leftCard'], tip:'Passe o mouse na foto e clique em ✎'}},
+    {k:['escrever na foto','texto na foto','legenda na foto','escrita na foto','girar texto','fundo do texto da marcacao','cantos','modelo de texto','italico','sublinhado','texto da marcacao'], q:'Texto sobre a foto', a:'<p>No editor de marcações (✎), escolha <b>T Texto</b>, digite em <b>Texto da marcação</b> e tecle Enter (ou <b>↵ Enviar texto</b>). Depois arraste para o lugar. Opções:</p><ul><li><b>Fonte</b>, <b>Modelo</b>, A− / A+, negrito, itálico e sublinhado, alinhamento.</li><li>Girar: ⟲ ⟳ de 15° (teclas [ e ]), <b>0°</b> deixa reto, <b>Centralizar na foto</b>.</li><li><b>Fundo</b> preto, branco, amarelo, verde, vermelho, azul ou outra cor, com <b>Opacidade</b> e <b>Cantos</b>.</li></ul>', w:{sel:['#leftGallery img','#rightGallery img','#leftCard'], tip:'✎ na foto › T Texto'}},
+    {k:['lupa','ampliar detalhe','zoom no detalhe','aumentar detalhe','destacar detalhe','detalhe pequeno','aproximar detalhe'], q:'Lupa (ampliar um detalhe)', a:'<p>No editor de marcações (✎), clique em <b>Lupa</b>. Arraste sobre o detalhe para criar o círculo (ou só clique nele) e escolha a <b>Ampliação</b>. Tecle Enter para congelar o detalhe e depois arraste a lupa para onde quiser.</p>', w:{sel:['#leftGallery img','#rightGallery img','#leftCard'], tip:'✎ na foto › Lupa'}},
+    {k:['selo na foto','icone de correto','icone de incorreto','certo na foto','errado na foto','simbolo','check','x na foto','visto','sinal de certo','sinal de errado'], q:'Ícones ✅ / ❌ sobre a foto', a:'<p>No editor de marcações (✎), use <b>Correto</b> ou <b>Incorreto</b>: clique na foto para inserir ou arraste para definir o tamanho. Há 3 estilos (círculo preenchido, círculo branco com borda ou só o símbolo). O correto nasce verde e o incorreto vermelho; com o ícone selecionado, as cores trocam o tom.</p><p>Para um aviso em faixa sobre o slide (CORRETO, PERIGO…), use as <b>etiquetas prontas</b>.</p>', w:{sel:['#leftGallery img','#rightGallery img','#leftCard'], tip:'✎ na foto › Correto / Incorreto'}},
+    {k:['sobrepor','sobreposta','sobreposicao','figura na foto','imagem sobre a foto','imagem em cima da foto','figura em cima da foto','overlay','figura auxiliar'], q:'Figura sobreposta na foto', a:'<p>No editor de marcações (✎), clique em <b>Figura</b> e escolha a imagem. Arraste para posicionar e ajuste <b>Opacidade</b>, <b>Proporção</b>, <b>Largura</b> e <b>Altura</b> (ou pelas alças dos cantos). <b>Trocar figura</b> substitui a imagem.</p><p>Se a figura deve ficar solta sobre o slide inteiro (logo, placa), prefira <b>🖼️ + Figura</b> no bloco “Figuras, textos e emojis livres”.</p>', w:{sel:['#leftGallery img','#rightGallery img','#leftCard'], tip:'✎ na foto › Figura'}},
+    {k:['webm','tv nao abre','nao abre na tv','nao reproduz','nao toca na tv','formato nao suportado','arquivo nao abre','video nao abre','4k nao','navegador nao grava','h 264','h264','codec'], trouble:true, q:'O vídeo não abre na TV / saiu WEBM', a:'<p>O que resolve:</p><ul><li>Gere no <b>Google Chrome</b> ou <b>Microsoft Edge</b> atualizados, no computador. Eles gravam MP4 H.264, o formato mais aceito pelas TVs.</li><li>Outros navegadores podem gravar só <b>WEBM</b> ou MP4 sem H.264; o editor avisa antes de gerar.</li><li><b>4K</b> só funciona em navegadores com suporte; se aparecer aviso, use <b>Full HD</b>.</li><li>Copie para um pen drive <b>FAT32 ou exFAT</b> e abra em USB › Vídeos.</li><li>A TV ainda não abre? Use <b>Fotos para TV</b> (JPG) com repetição ligada.</li><li>A gravação leva o tempo da apresentação: deixe a aba aberta até terminar.</li></ul>', w:{sel:'#tvUsbVideoBtn', tip:'Apresentação completa em MP4'}, x:() => [act('🖼️ Gerar fotos para TV', () => openExport('tvUsbPhotosBtn', 'fotos'))]},
+    {k:['navegador','qual navegador','chrome','edge','firefox','safari','opera','browser','internet explorer'], q:'Qual navegador usar', a:'<p>Use o <b>Google Chrome</b> ou o <b>Microsoft Edge</b> atualizados, no computador. Eles geram o MP4 H.264 (inclusive 4K, quando o aparelho suporta), que as TVs abrem. Em outros navegadores o editor funciona, mas a exportação de vídeo pode sair em WEBM ou nem gravar; nesse caso, use <b>Fotos para TV</b>.</p>'},
+    {k:['carregando','travada','travado','travou','tela bloqueada','nao carrega','tentar novamente','aguarde','sincronizacao demorando','nao abre o editor'], trouble:true, q:'Tela parada em “Carregando”', a:'<p>Ao abrir, a tela fica bloqueada até terminar a sincronização: assim ninguém trabalha com dados desatualizados.</p><ul><li>Confira a internet e clique em <b>Tentar novamente</b>.</li><li>A barra azul do topo mostra o estado; com “Salvo e sincronizado ✓” está tudo certo.</li><li>Sem internet, use uma cópia de <b>Baixar HTML atualizado</b>, que abre em “Modo local”.</li></ul>', w:{sel:['#syncGateRetry','#syncBar'], tip:'Estado da sincronização'}},
+    {k:['modo local','salvo neste dispositivo','nao sincroniza','so no meu computador','so neste computador','copia baixada'], q:'O que é o “Modo local”', a:'<p>Aparece quando você abre uma cópia baixada pelo botão <b>Baixar HTML atualizado</b>. Nesse modo tudo é salvo <b>só neste aparelho</b> e não vai para os outros. Para trabalhar com a equipe, abra o editor pelo endereço compartilhado.</p>', w:{sel:'#syncBar', tip:'Estado do salvamento'}},
+    {k:['foto nao entra','nao consigo colocar foto','foto nao aparece','nao abre a imagem','formato da foto','tipo de arquivo','limite de fotos','maximo de fotos','foto borrada','foto pixelada','baixa qualidade','nitidez','foto ruim','foto embacada','resolucao'], trouble:true, q:'Problemas com fotos', a:() => `<p>Confira:</p><ul><li>Formatos aceitos: <b>JPG, PNG ou WebP</b>.</li><li>No máximo <b>${typeof MAX_IMAGES_PER_SIDE !== 'undefined' ? MAX_IMAGES_PER_SIDE : 6} fotos por lado</b>; acima disso, o editor avisa e só adiciona o que cabe.</li><li>Para nitidez na TV 4K, use as <b>fotos originais</b> em alta resolução, não prints do WhatsApp.</li><li>Fotos importadas na versão antiga precisam ser reinseridas para recuperar a qualidade.</li><li>Foto vertical? Use o encaixe <b>Fundo estendido</b>.</li></ul>`, w:{sel:'#leftCard', tip:'Clique no quadro para escolher as fotos'}, x:() => [act('📷 Escolher fotos', () => pickPhotos('left'), 'pri')]},
+    {k:['ponto amarelo','bolinha amarela','cerebro','assistente','atalho do assistente','ctrl /'], q:'Sobre o assistente (🧠)', a:'<p>Sou o Cérebro SESE. A <b>bolinha amarela</b> no botão 🧠 indica que você ainda não abriu o assistente; ela some quando abre. <b>Ctrl+/</b> abre e fecha, <b>Esc</b> fecha. Funciono sem internet.</p>', w:{sel:'#brainFab', tip:'Cérebro SESE'}},
+    {k:['video no slide','colocar video','inserir video','pagina de video','tipo video','video nesta pagina','adicionar video'], q:'Vídeo dentro de um slide', a:'<p>Em <b>Tipo de página</b>, escolha <b>🎬 Vídeo (neste slide)</b> e selecione o vídeo no bloco que aparece na barra lateral. Páginas novas nunca nascem como vídeo: crie a página e depois mude o tipo. Esse tipo precisa do arquivo <code>video-support.js</code> ao lado do HTML na hospedagem.</p>', w:{sel:'#extraLayoutGroup [data-layout="video"]', tip:'🎬 Vídeo'}},
+    {k:['janela nova pagina','passos da nova pagina','posicao da pagina','onde a pagina nasce','depois desta'], q:'Janela “Nova página”', a:'<p>Ao clicar em <b>+ Nova</b>, a janela pede:</p><ol><li><b>Tipo de layout</b> (obrigatório)</li><li><b>Cores</b></li><li><b>Fonte e título</b></li><li><b>Posição</b> da nova página na lista</li></ol><p>A página nasce limpa, sem fotos nem vídeo.</p>', w:{sel:'#newPageBtn', tip:'+ Nova'}, x:() => [act('➕ Abrir agora', () => newPage('', null), 'pri')]},
+    {k:['preto e branco','filtro','brilho','contraste','saturacao','escurecer','clarear','editar cor da foto','foto escura','foto clara','sepia'], q:'Filtros e ajuste de cor da foto', a:'<p>O editor <b>não tem filtros</b> de cor (preto e branco, brilho, contraste). Ajuste a foto antes, no editor de fotos do celular ou do computador, e insira de novo. No SESE Studio você pode <b>enquadrar</b> (✋), <b>marcar</b> (✎) e escolher o <b>encaixe</b>.</p>', w:{sel:['#leftGallery img','#rightGallery img','#leftCard'], tip:'Fotos do slide'}},
+    {k:['so o correto','so o incorreto','somente o correto','somente o incorreto','apenas o correto','apenas o incorreto','um lado so','um lado','sem o lado incorreto','sem o lado correto','esconder o lado'], q:'Mostrar só o correto ou só o incorreto', a:'<p>Em <b>Tipo de página</b>, escolha <b>✅ Só o correto</b> (procedimentos) ou <b>❌ Só o incorreto</b> (alertas). A página passa a ter um lado só, com fotos maiores.</p>', w:{sel:'#extraLayoutGroup .layout-picker', tip:'Tipo de página'}, x:() => [act('✅ Só o correto', () => changeKind('only-correct'), 'pri'), act('❌ Só o incorreto', () => changeKind('only-incorrect')), act('✅❌ Voltar a Correto × Incorreto', () => changeKind('compare'))]},
+    {k:['topicos','em topicos','lista','marcadores','bullet','organizar texto','organizar o texto','deixar em lista','texto em lista','arrumar texto'], q:'Organizar o texto em tópicos', a:'<p>Em páginas <b>Texto livre</b> ou <b>Figura + texto</b>, eu transformo o texto em tópicos (uma ideia por linha, com •). Na TV, use até 5 tópicos curtos. Você também pode usar os botões <b>• Marcador</b>, <b>✅ Item</b> e <b>⚠️ Item</b>.</p>', x:() => [act('🧹 Organizar o texto deste slide', () => organizeText(currentPage), 'pri')]}
+  ];
+  KB.push(...KB_MORE);
+  // Onde fica cada função da base original (para o “📍 Mostrar onde fica”) e sinônimos extras.
+  const KB_WHERE = {
+    'Como gerar o MP4?': {sel:'#tvUsbVideoBtn', tip:'Apresentação completa em MP4'},
+    'Inserir fotos e figuras': {sel:['#leftCard','#addFloatImageBtn'], tip:'Clique no quadro para escolher as fotos'},
+    'Criar, duplicar e excluir slides': {sel:'#pagesGroup', tip:'+ Nova · Duplicar · Excluir'},
+    'Como exportar para PowerPoint?': {sel:'#pptExportBtn', tip:'PowerPoint (com vídeo)'},
+    'Fotos para TV': {sel:'#tvUsbPhotosBtn', tip:'Fotos para TV'},
+    'Exportar PDF': {sel:'#printBtn', tip:'Exportar PDF'},
+    'Backup': {sel:['#saveProjectBtn'], tip:'Salvar backup · Carregar backup'},
+    'Baixar HTML / usar sem internet': {sel:'button[onclick="downloadHTML()"]', tip:'Baixar HTML atualizado'},
+    'Como funciona o salvamento?': {sel:'#syncBar', tip:'Estado do salvamento'},
+    'Desfazer': {sel:'#projectUndoBtn', tip:'Desfazer / Refazer'},
+    'Marcar pontos na foto': {sel:['#leftGallery img','#rightGallery img','#leftCard'], tip:'Passe o mouse na foto e clique em ✎'},
+    'Apagar marcações que vieram na foto': {sel:['#leftGallery img','#rightGallery img','#leftCard'], tip:'✎ na foto › ▧ Apagar antigas'},
+    'Enquadrar a foto': {sel:['#leftGallery img','#rightGallery img','#leftCard'], tip:'Passe o mouse na foto e clique em ✋'},
+    'Encaixe das fotos': {sel:'#figureOptions', tip:'Encaixe das fotos e figuras'},
+    'Remover uma foto': {sel:['#leftGallery img','#rightGallery img','#leftCard'], tip:'Passe o mouse na foto e clique no ×'},
+    'Tipos de página': {sel:'#extraLayoutGroup', tip:'Tipo de página'},
+    'Etiquetas prontas': {sel:'#labelGrid', tip:'Etiquetas prontas'},
+    'Emojis': {sel:'#emojiGrid', tip:'Emojis'},
+    'Mexer em figuras e textos livres': {sel:['#floatPanelGroup','#floatGroup'], tip:'Figuras, textos e emojis livres'},
+    'Cores do layout': {sel:'#extraThemeGroup', tip:'Cores e fontes do layout'},
+    'Fontes': {sel:'#pageFontSelect', tip:'Fonte da página'},
+    'Ocultar slides': {sel:'#toggleHiddenBtn', tip:'Ocultar este slide'},
+    'Mudar a ordem': {sel:'#pagesList', tip:'Setas ↑ ↓ ou alça ⋮⋮'},
+    'Numeração': {sel:'#showNumberInput', tip:'Mostrar número nesta página'},
+    'Apresentar na TV': {sel:['#tvModeBtn'], tip:'Apresentação · ▶ TV automática'},
+    'Modo quiosque': {sel:'#autoTvBtn', tip:'TV automática'},
+    'Pausar em um slide': {sel:'#pagesList', tip:'⏸ Pausar no slide da lista'},
+    'Música de fundo': {sel:'#musicGroup', tip:'Música de fundo'},
+    'Intervalo entre slides': {sel:'#autoTvInterval', tip:'Trocar página a cada', open:() => { const pn = byId('intervalPanel'); if (pn && pn.hidden) byId('intervalBtn')?.click(); }},
+    'Visualizar a apresentação': {sel:['#previewTabBtn','#previewPane'], tip:'👁 Visualizar apresentação'},
+    'Usar no celular': {sel:'.mobile-tabs', tip:'Abas do celular'},
+    'Tela escura': {sel:'#darkModeBtn', tip:'Tela escura'},
+    'Figura + texto': {sel:'#splitOptions', tip:'Opções da tela dividida', kind:'split'}
+  };
+  const KB_KEYS_MORE = {
+    'Como gerar o MP4?': ['arquivo para tv','arquivo pra tv','baixar para tv','levar para tv','mandar para tv','video para pen drive','quanto tempo demora','demora para gerar','gerar mp4','video da apresentacao','video final','baixar video','salvar video','gravar video','filme','apresentacao em video','exportar mp4','pen drive','pendrive'],
+    'Criar, duplicar e excluir slides': ['inserir nova pagina','inserir novo slide','novos slides','slide novo','pagina nova','apagar pagina','deletar slide','deletar pagina','remover slide','remover pagina','copiar slide','copiar pagina','criar nova pagina','adicionar slide','adicionar pagina','botao de apagar','botao de excluir'],
+    'Música de fundo': ['abaixar volume','aumentar volume','volume','musica no mp4','musica no video','trocar musica','mudar musica','proxima musica','desligar musica','sem som','tirar o som','mudo','ouvir'],
+    'Como funciona o salvamento?': ['outra pessoa','outras pessoas','colegas','equipe','ver minhas alteracoes','ao mesmo tempo','compartilhar','perdi','perder','salvar','salva automatico'],
+    'Backup': ['versao antiga','recuperar','voltar versao','versao anterior','restaurar projeto'],
+    'Etiquetas prontas': ['aviso grande','escrever aviso','colocar aviso','faixa de aviso','placa','perigo','proibido','pare','atencao','aviso','use epi','emergencia','bloqueie','fique atento','importante'],
+    'Enquadrar a foto': ['zoom da foto','zoom na imagem','mexer no zoom','aproximar','afastar','recortar','recorte','ajustar foto','foto cortada','centralizar foto','arrastar foto'],
+    'Encaixe das fotos': ['foto em pe','foto deitada','foto esticada','deformada','sobra','faixa preta','bordas'],
+    'Apagar marcações que vieram na foto': ['rabisco','rabiscos','marca antiga','apagar desenho','apagar seta antiga','esconder marca'],
+    'Apresentar na TV': ['passar slides','projetar','telao','iniciar apresentacao','comecar apresentacao'],
+    'Modo quiosque': ['rodando sozinha','rodar sozinha','ciclo','loop','repetir sempre','sem parar','autonomo','link da tv','endereco da tv'],
+    'Exportar PDF': ['impressora','imprimir slide','salvar pdf'],
+    'Intervalo entre slides (b)': ['tempo de cada slide','quanto tempo','demora','mais rapido','mais devagar','lento','rapido'],
+    'Ocultar slides': ['sumir','invisivel','nao mostrar','desativar slide','tirar da tv','exibir','desmarcar'],
+    'Marcar pontos na foto': ['colocar seta','colocar flecha','colocar circulo','por seta','fazer seta','fazer circulo','desenhar seta','marcar erro','marcar o erro','circular','sublinhar na foto','destacar na foto'],
+    'Mudar a ordem': ['slide no final','para o final','para o fim','no comeco','para o comeco','subir slide','descer slide','primeiro slide','trocar posicao','mudar posicao'],
+    'Numeração': ['tirar numero','sem numero','esconder numero','numero do slide'],
+    'Vídeo de abertura': ['vinheta','video inicial','comeco','introducao'],
+    'Emojis': ['emoticon','carinha','figurinha','emoji no titulo','emoji no texto'],
+    'Fontes': ['enviar fonte','fonte propria','minha fonte','ttf','otf','woff','fonte em todas','trocar letra','tipo de letra'],
+    'Cores do layout': ['mesma cor','padronizar cor','padronizar as cores','todas com a mesma cor','cor em todos','colorir','tonalidade','cor do slide','mudar cor','trocar cor','cores em todas'],
+    'Inserir fotos e figuras': ['logo','logotipo','marca da empresa','icone','placa','imagem solta','figura livre'],
+    'Mexer em figuras e textos livres': ['apagar texto','excluir texto','remover texto','apagar emoji','apagar figura livre','tirar texto','mover texto'],
+    'Intervalo entre slides': ['relogio','reloginho','cronometro'],
+    'Figura + texto': ['figura e texto','figura com texto','imagem e texto','foto e texto','foto com texto'],
+    'Tipos de página': ['so de texto','slide de texto','pagina de texto','texto livre','so texto','so figura','so imagem','tipo do slide','mudar tipo'],
+    'Remover uma foto': ['foto errada','imagem errada','trocar foto','trocar a foto','substituir foto','trocar imagem','excluir imagem','apagar imagem','remover imagem','tirar imagem']
+  };
+  KB_KEYS_MORE['Intervalo entre slides'] = KB_KEYS_MORE['Intervalo entre slides'].concat(KB_KEYS_MORE['Intervalo entre slides (b)']);
+  KB.forEach(e => { if (KB_WHERE[e.q] && !e.w) e.w = KB_WHERE[e.q]; if (KB_KEYS_MORE[e.q]) e.k = e.k.concat(KB_KEYS_MORE[e.q]); });
+  // Ações diretas nas respostas sobre tipos de página e duração do MP4.
+  const KIND_BTNS = () => ['compare','only-correct','only-incorrect','text','split','image'].map(k => act(esc(kindLabel(k)), () => changeKind(k)));
+  (e => { if (e) e.x = KIND_BTNS; })(KB.find(e => e.q === 'Tipos de página'));
+  (e => { if (e) e.x = () => [act('🔁 Mudar esta página para Figura + texto', () => changeKind('split'), 'pri')]; })(KB.find(e => e.q === 'Figura + texto'));
+  (e => { if (!e) return; const base = e.a; e.a = () => (typeof base === 'function' ? base() : base) + `<p>⏱ A gravação leva mais ou menos o tempo da apresentação: hoje, ~${fmtTime(app().pages.filter(p => !hidden(p)).length * interval())} de slides, mais a abertura.</p>`; })(KB.find(e => e.q === 'Como gerar o MP4?'));
   const kbBy = q => KB.find(e => e.q === q);
   function labelButtons() { return (typeof LABEL_PRESETS !== 'undefined' ? LABEL_PRESETS : []).map(p => act(esc(p.text), () => addLabel(p))); }
   function themeButtons(all) {
@@ -10628,297 +10692,6 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
       acts([act('🔎 Ver os problemas', analysisHtml), act('🎬 Gerar assim mesmo', () => openExport('tvUsbVideoBtn', 'MP4'), 'pri')]);
     openExport('tvUsbVideoBtn', 'MP4');
     return `<p>🎬 Abri o gerador: ${r.nVis} slides visíveis, ${interval()} s cada. Escolha Full HD ou 4K e clique em <b>Gerar MP4</b>.</p>`;
-  }
-
-  /* ================================================================
-     INTERPRETAÇÃO DOS PEDIDOS (sinônimos, erros de digitação e dúvidas)
-     1. Frases inteiras viram o comando conhecido ("jogar fora" → excluir).
-     2. Cada palavra é comparada a um dicionário de sinônimos por comando.
-     3. Palavras com erro de digitação são corrigidas pela mais parecida.
-     4. Se faltar o alvo ou o comando, o assistente pergunta com a
-        palavra que conhece, com botões para responder.
-     ================================================================ */
-  const COMMANDS = [
-    {id:'excluir', word:'excluir', label:'Excluir', syn:'exclua, elimine, remova, apague, delete, descarte, retire, tire, suprima, limpe, jogue fora, some com'},
-    {id:'criar', word:'crie', label:'Criar', syn:'crie, faça, acrescente, monte, produza, elabore, gere um slide, novo'},
-    {id:'colocar', word:'coloque', label:'Inserir / colocar', syn:'insira, coloque, adicione, inclua, anexe, importe, carregue, suba, bote, ponha'},
-    {id:'ir', word:'va', label:'Ir para', syn:'vá, abra, mostre, navegue, acesse, leve, passe para, pule para, volte para, avance para'},
-    {id:'ocultar', word:'ocultar', label:'Ocultar', syn:'oculte, esconda, desative, desmarque, omita, deixe de mostrar, não exibir'},
-    {id:'exibir', word:'exibir', label:'Exibir', syn:'exiba, desoculte, reexiba, reative, revele, volte a mostrar, mostre de novo'},
-    {id:'duplicar', word:'duplique', label:'Duplicar', syn:'duplique, copie, clone, replique, repita'},
-    {id:'mudar', word:'mude', label:'Mudar', syn:'mude, troque, altere, modifique, converta, transforme, substitua, ajuste, defina, configure, deixe'},
-    {id:'gerar', word:'gere', label:'Gerar / exportar', syn:'gere, exporte, baixe, renderize, produza o vídeo, salve como'},
-    {id:'organizar', word:'organize', label:'Organizar', syn:'organize, arrume, ajeite, estruture, ordene, reorganize, formate, padronize'},
-    {id:'analisar', word:'analise', label:'Analisar', syn:'analise, revise, verifique, avalie, confira, inspecione, cheque, examine, diagnostique'},
-    {id:'apresentar', word:'apresente', label:'Apresentar', syn:'apresente, inicie, comece, rode, passe na TV, reproduza, transmita, play'},
-    {id:'pausar', word:'pause', label:'Pausar', syn:'pause, congele, fixe, trave, segure, pare no slide'},
-    {id:'desfazer', word:'desfazer', label:'Desfazer', syn:'desfaça, volte atrás, cancele a última'},
-    {id:'tocar', word:'toque', label:'Tocar música', syn:'toque, ouça, ligue o som, play na música'},
-    {id:'parar', word:'pare', label:'Parar música', syn:'pare, desligue, silencie, mute'}
-  ];
-  const OBJECTS = [
-    {id:'slide', label:'Slide / página', syn:'slide, página, lâmina, folha, tela, transparência'},
-    {id:'foto', label:'Foto / figura', syn:'foto, figura, imagem, fotografia, ilustração, desenho, print, logo, ícone'},
-    {id:'texto', label:'Texto', syn:'texto, frase, caixa de texto, escrita'},
-    {id:'etiqueta', label:'Etiqueta', syn:'etiqueta, selo, tag, placa, adesivo, carimbo, aviso'},
-    {id:'elemento', label:'Elemento livre', syn:'elemento, emoji, objeto, item selecionado'},
-    {id:'cores', label:'Cores', syn:'cores, cor, paleta, tema, esquema de cores'},
-    {id:'fonte', label:'Fonte', syn:'fonte, tipografia, tipo de letra'},
-    {id:'titulo', label:'Título', syn:'título, cabeçalho, manchete, nome do slide'},
-    {id:'video', label:'Vídeo MP4', syn:'mp4, vídeo, filme, filmagem, clipe'},
-    {id:'musica', label:'Música', syn:'música, som, trilha, áudio, canção'},
-    {id:'intervalo', label:'Intervalo', syn:'intervalo, tempo, duração, segundos, velocidade'}
-  ];
-  // 1) Frases → comando
-  const PHRASES = [
-    [/\bjog(a|ue|ar|ou)\s+(isso\s+|isto\s+)?fora\b/g, 'excluir'],
-    [/\bsum(a|ir|e)\s+com\b/g, 'excluir'],
-    [/\bcopia de seguranca\b/g, 'backup'],
-    [/\btipo de letra\b/g, 'fonte'],
-    [/\besquema de cores\b/g, 'cores'],
-    [/\bcaixa de texto\b/g, 'texto'],
-    [/\b(deix(e|a|ar) de|para de|parar de|pare de)\s+(mostrar|exibir|aparecer)\b/g, 'ocultar'],
-    [/\b(nao|sem)\s+(mostrar|exibir|aparecer)\b/g, 'ocultar'],
-    [/\bvolt(e|a|ar)\s+a\s+(mostrar|exibir|aparecer)\b/g, 'exibir'],
-    [/\b(mostr(e|a|ar)|exib(a|e|ir))\s+(de novo|novamente|outra vez)\b/g, 'exibir'],
-    [/\bvolt(e|a|ar)\s+atras\b/g, 'desfazer'],
-    [/\bcancel(e|a|ar)\s+(a\s+)?ultima\b/g, 'desfazer'],
-    [/\b(pass(e|a|ar)|pul(e|a|ar)|sig(a|ue)|seguir|avanc(e|a|ar)|volt(e|a|ar)|ir)\s+(para|pro|pra|ate)\s+(o\s+|a\s+)?(?=(slide|pagina|ultim|primeir|proxim|\d))/g, 'va para o '],
-    [/\b(lig(ue|a|ar))\s+(o\s+|a\s+)?(som|musica)\b/g, 'toque musica'],
-    [/\b(deslig(ue|a|ar)|silenci(e|a|ar)|mut(e|ar))\s+(o\s+|a\s+)?(som|musica)\b/g, 'pare musica'],
-    [/\bpar(e|ar)\s+(no|na)\s+(?=(slide|pagina|\d))/g, 'pause no ']
-  ];
-  // 2) Palavra → comando/objeto (palavra inteira já sem acento)
-  const WORDS = [
-    [/^(exclu(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|elimin(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|remov(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|apag(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|apagu(e|em)|delet(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|descart(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|retir(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|suprim(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|destru(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|tir[ae]|tirar|tirem|limp[ae]|limpar)$/, 'excluir'],
-    [/^(acrescent(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|mont[aeo]|montar|produz(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|elabor(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|crio)$/, 'crie'],
-    [/^(inclu[aio]|incluir|incluam|anex[aeo]|anexar|coloco|insiro|adiciono|ponho|boto|import[ae]|importar|carregu?[ae]|carregar|sub[ae]|subir|bot[ae]|botar|ponha|poe|insir[ao]|insere|inserir|adicion[ae]|adicionar)$/, 'coloque'],
-    [/^(naveg(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|navegu(e|em)|acess[ae]|acessar)$/, 'va'],
-    [/^(ocult[ae]|ocultar|esconda|esconde|esconder|desativ(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|desmarqu?[ae]|desmarcar|omit[ae]|omitir)$/, 'ocultar'],
-    [/^(desocult(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|reexib(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|reativ(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|revel[ae]|revelar)$/, 'exibir'],
-    [/^(dupliqu(e|em)|duplic(a|o|ar|ou|ando)|copi[ae]|copiar|clon[ae]|clonar|replic(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|repliqu(e|em)|repit[ao]|repetir)$/, 'duplique'],
-    [/^(mudo|troco|alter[aeo]|alterar|modifiqu?[ae]|modifico|modificar|convert[aeo]|converter|transform[aeo]|transformar|substitu[aio]|substituir|troqu?[ae]|trocar|ajust[ae]|ajustar|defin[ae]|definir|configur[ae]|configurar)$/, 'mude'],
-    [/^(export[aeo]|exportar|baix[ae]|baixar|renderiz(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|gero)$/, 'gere'],
-    [/^(arrum(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|ajeit(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|estrutur(e|ar)|orden[aeo]|ordenar|reorganiz(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|format[ae]|formatar|organizo)$/, 'organize'],
-    [/^(revis[ae]|revisar|verifiqu?[ae]|verificar|avali[ae]|avaliar|confir[ao]|conferir|confere|inspecion(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|audit(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|chequ?[ae]|checar|examin(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|diagnostiqu?[ae]|diagnosticar)$/, 'analise'],
-    [/^(congel(a|e|o|ar|er|ir|am|em|ei|ou|i|ando|endo|indo)?|fix[ae]|fixar|trav[ae]|travar|segur[ae]|segurar)$/, 'pause'],
-    [/^(desfac[ao]|desfaz|desfazer)$/, 'desfazer'],
-    [/^(pagina|paginas|lamina|laminas|folha|folhas|transparencia|transparencias|slides|pag|pg)$/, 'slide'],
-    [/^(fotografia|fotografias|ilustracao|ilustracoes|retrato|retratos|capturas?)$/, 'foto'],
-    [/^(filme|filmes|filmagem|clipe|clip)$/, 'video'],
-    [/^(tags?|placas?|plaquinhas?|adesivos?|carimbos?)$/, 'etiqueta'],
-    [/^(tipografia)$/, 'fonte'],
-    [/^(trilha|audio|cancao|cancoes|musicas)$/, 'musica'],
-    [/^(paletas?|temas?|colorido)$/, 'cores'],
-    [/^(cabecalho|manchete)$/, 'titulo']
-  ];
-  // 3) Vocabulário para corrigir erros de digitação
-  const VOCAB = ('toque tocar pare parar ligue desligue musica som excluir exclua elimine remova apague delete descarte retire crie criar coloque inserir insira adicione adicionar inclua anexe duplique duplicar copie ocultar oculte esconda exibir exiba mostre mostrar mude mudar troque altere gere gerar exporte organize organizar arrume analise analisar revise verifique confira apresente apresentar apresentacao pause pausar desfazer refazer ' +
-    'slide slides pagina paginas foto fotos figura figuras imagem imagens texto textos etiqueta etiquetas emoji elemento elementos cores paleta fonte fontes musica intervalo segundos correto incorreto titulo titulos video powerpoint backup marcacao marcacoes proximo anterior ultimo primeiro padronizar topicos livre dividida comparacao seguranca qualidade manutencao planejamento vermelho laranja amarelo verde roxo vinho turquesa grafite oculto ocultos todos todas atual selecionado selecionada').split(' ');
-  const VOCAB_SET = new Set(VOCAB);
-  const KEEP = new Set(('toque toca tocar pare para parar ligue liga desligue ouvir ouca quero preciso pode poderia favor obrigado agora depois antes sobre todos todas tambem quando quanto quantos quantas como onde porque nesta neste nessa nesse aquele aquela coisa algum alguma minha minhas nossa nosso dessa desse desta deste estes estas esses essas outro outra outros outras mesmo mesma ainda apenas somente sempre nunca muito pouco maior menor melhor tempo deixar deixe fazer favor ' +
-    'luvas capacete protetor auricular oculos prensa maquina equipamento empresa treinamento trabalho operador lider area setor regra regras uso usar use').split(' '));
-  function osa(a, b) {
-    const m = a.length, n = b.length; if (Math.abs(m - n) > 2) return 9;
-    const d = Array.from({length:m + 1}, (_, i) => [i, ...Array(n).fill(0)]);
-    for (let j = 1; j <= n; j++) d[0][j] = j;
-    for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) {
-      const c = a[i - 1] === b[j - 1] ? 0 : 1;
-      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
-      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
-    }
-    return d[m][n];
-  }
-  function fixTypo(word) {
-    if (word.length < 5 || VOCAB_SET.has(word) || KEEP.has(word) || /\d/.test(word)) return null;
-    if (WORDS.some(([re]) => re.test(word))) return null;
-    const limit = word.length >= 8 ? 2 : 1;
-    let best = null, bestD = 9, tie = false;
-    VOCAB.forEach(v => { const dd = osa(word, v); if (dd < bestD) { best = v; bestD = dd; tie = false; } else if (dd === bestD && v !== best) tie = true; });
-    return bestD <= limit && !tie ? best : null;
-  }
-  // Transforma o pedido no "idioma" de comandos do assistente.
-  function canonical(t) {
-    const notes = [];
-    // Depois de "sobre", "chamado", "título", ":" vem conteúdo (título, texto): não é traduzido.
-    const marker = t.search(/\s(sobre|chamad[oa]|com o titulo|titulo|com o texto|dizendo|escrito|com a frase)\b|:/);
-    const content = marker >= 0 ? t.slice(marker) : '';
-    let s = ' ' + (marker >= 0 ? t.slice(0, marker) : t) + ' ';
-    PHRASES.forEach(([re, to]) => { s = s.replace(re, m => { notes.push([m.trim(), to.trim()]); return ' ' + to + ' '; }); });
-    const out = s.trim().split(/\s+/).map(w => {
-      for (const [re, to] of WORDS) if (re.test(w)) { if (w !== to && !to.startsWith(w.slice(0, 4))) notes.push([w, to]); return to; }
-      const fixed = fixTypo(w);
-      if (fixed) { let to = fixed; for (const [re, c] of WORDS) if (re.test(fixed)) { to = c; break; } notes.push([w, to, 'typo']); return to; }
-      return w;
-    });
-    return {t: (out.join(' ') + ' ' + content).replace(/\s+/g, ' ').trim(), notes};
-  }
-  function noteHtml(notes) {
-    const shown = notes.filter((n, i) => notes.findIndex(x => x[0] === n[0]) === i).slice(0, 3);
-    if (!shown.length) return '';
-    return '<p style="margin-top:8px;font-size:11.5px;opacity:.75">🧠 Entendi ' + shown.map(([from, to, kind]) => `“${esc(from)}” como <b>${esc(to)}</b>${kind === 'typo' ? ' (erro de digitação)' : ''}`).join(', ') + '.</p>';
-  }
-  // Lista de slides: "slides 2, 3 e 5", "do 2 ao 4", "o 3", "último", "este".
-  function slideList(t, allowBare) {
-    const P = app().pages, list = new Set();
-    const range = t.match(/(?:slides?|pagina)?\s*(?:do|de|entre)?\s*(\d{1,3})\s*(?:ao|a|ate|e o|-)\s*(\d{1,3})\b/);
-    if (range && /(ao|ate|-|\bde\b|\bdo\b|entre)/.test(range[0])) { let [a, b] = [+range[1], +range[2]]; if (a > b) [a, b] = [b, a]; for (let i = a; i <= b; i++) list.add(i - 1); }
-    const after = t.match(/(?:slides?|paginas?)\s*((?:\d{1,3}\s*(?:,|e|\s)\s*)*\d{1,3})/);
-    if (after) after[1].split(/\s*(?:,|e|\s)\s*/).filter(Boolean).forEach(n => list.add(+n - 1));
-    if (!list.size && allowBare) { const bare = t.match(/\b(?:o|a|os|as|numero|n)\s+((?:\d{1,3}\s*(?:,|e)\s*)*\d{1,3})\b/); if (bare) bare[1].split(/\s*(?:,|e)\s*/).filter(Boolean).forEach(n => list.add(+n - 1)); }
-    if (!list.size) { const one = slideIndex(t); if (one !== null) list.add(one); }
-    return [...list].filter(i => Number.isInteger(i) && i >= 0 && i < P.length).sort((a, b) => a - b);
-  }
-  const OBJ_RE = {
-    slide: /\b(slide|slides|pagina|paginas|tela|este|esse|deste|desse|atual|ultimo|primeiro|proximo|anterior)\b|\b\d{1,3}\b/,
-    foto: /\b(foto|fotos|figura|figuras|imagem|imagens|ilustr\w*|desenho\w*|print|logo|icone|lado)\b/,
-    texto: /\b(texto|textos|frase|frases|escrita|escrito)\b/,
-    etiqueta: /\b(etiqueta|etiquetas|selo|selos)\b/,
-    elemento: /\b(elemento|elementos|emoji|emojis|objeto|objetos|selecionad[oa])\b/,
-    marcacao: /\b(marcac\w*|seta|setas|circulo|circulos|retangulo|lupa|rabisco\w*)\b/,
-    cores: /\b(cor|cores|paleta)\b/, fonte: /\b(fonte|fontes|letra)\b/, titulo: /\b(titulo|titulos|nome)\b/,
-    video: /\b(mp4|video|powerpoint|pptx|ppt|pdf|zip|backup|html)\b/, musica: /\b(musica|som)\b/,
-    layout: /\b(tipo|layout|modelo|texto livre|figuras?|correto|incorreto|dividida)\b/, intervalo: /\b(intervalo|segundos|tempo)\b/,
-    apresentacao: /\b(apresentacao|tv|televisao)\b/
-  };
-  const objectsIn = t => Object.keys(OBJ_RE).filter(k => OBJ_RE[k].test(t));
-  const commandIn = t => {
-    if (/\bexcluir\b/.test(t)) return 'excluir';
-    if (/\b(duplique|duplicar|duplica)\b/.test(t)) return 'duplicar';
-    if (/\b(ocultar|oculte)\b/.test(t)) return 'ocultar';
-    if (/\b(exibir|exiba|exibe)\b/.test(t)) return 'exibir';
-    if (/\b(mude|mudar|muda)\b/.test(t)) return 'mudar';
-    if (/\b(gere|gerar|gera)\b/.test(t)) return 'gerar';
-    if (/\b(coloque|colocar|coloca)\b/.test(t)) return 'colocar';
-    if (/\b(organize|organizar|organiza)\b/.test(t)) return 'organizar';
-    if (/\b(crie|criar|cria)\b/.test(t)) return 'criar';
-    if (/\b(pause|pausar|pausa)\b/.test(t)) return 'pausar';
-    return null;
-  };
-  const lock = b => b.parentElement.querySelectorAll('button').forEach(x => x.disabled = true);
-
-  /* ---- Exclusões detalhadas ---- */
-  function confirmDeleteSlides(list, guessed) {
-    const P = app().pages;
-    if (!list.length) return null;
-    if (list.length >= P.length) return '<p>Não dá para excluir todos os slides: o projeto precisa de pelo menos um. Diga quais manter ou oculte os que não quer mostrar.</p>';
-    const names = list.map(i => slideRef(i)).join('<br>');
-    return `<p>Confirma <b>excluir</b> ${list.length > 1 ? 'estes ' + list.length + ' slides' : 'este slide'}?${guessed ? ' (entendi o número como slide)' : ''}</p><p>${names}</p>` +
-      acts([act('🗑 Sim, excluir', b => { lock(b); return deleteMany(list); }, 'dan'), act('Cancelar', b => { lock(b); return '<p>Ok, nada foi excluído.</p>'; })]);
-  }
-  function deleteMany(list) {
-    const P = app().pages; const sel = P[currentPage];
-    const targets = list.map(i => P[i]).filter(Boolean);
-    if (targets.length >= P.length) return '<p>O projeto precisa de pelo menos um slide.</p>';
-    commit('excluir ' + (targets.length > 1 ? targets.length + ' páginas' : 'página'), () => {
-      targets.forEach(p => { const i = P.indexOf(p); if (i >= 0) P.splice(i, 1); });
-      const keep = P.indexOf(sel); currentPage = keep >= 0 ? keep : Math.max(0, Math.min(list[0], P.length - 1));
-    });
-    return `<p>🗑 Excluí ${targets.length} slide(s). Se foi engano, use <b>Desfazer</b>.</p>` + acts([act('↶ Desfazer', () => { byId('projectUndoBtn')?.click(); return '<p>Desfeito.</p>'; })]);
-  }
-  function askDeletePhotos(i) {
-    const P = app().pages, p = P[i]; const L = imgs(p, 'left'), R = imgs(p, 'right'); const k = kindOf(p);
-    if (!L.length && !R.length) return `<p>O ${slideRef(i)} não tem fotos para excluir.</p>`;
-    const sideName = s => (k === 'compare' || k === 'only-correct' || k === 'only-incorrect') ? (s === 'left' ? 'correto' : 'incorreto') : 'figura';
-    const buttons = [];
-    [['left', L], ['right', R]].forEach(([s, list]) => list.forEach((_, n) => buttons.push(act(`🗑 Foto ${n + 1} (${sideName(s)})`, b => { b.disabled = true; goTo(i, true); removeGalleryImage(s, Math.min(n, imgs(app().pages[i], s).length - 1)); return `<p>Excluí a foto ${n + 1} do lado ${sideName(s)}. Os números das outras fotos podem ter mudado.</p>`; }))));
-    if (L.length && R.length) { buttons.push(act('Todas do lado correto', b => { lock(b); return clearSide(i, 'left'); })); buttons.push(act('Todas do lado incorreto', b => { lock(b); return clearSide(i, 'right'); })); }
-    buttons.push(act(`Todas as ${L.length + R.length} fotos`, b => { lock(b); goTo(i, true); clearImages(); return '<p>🗑 Excluí todas as fotos e marcações deste slide.</p>'; }, 'dan'));
-    return `<p>Quais fotos do ${slideRef(i)} você quer <b>excluir</b>?</p>` + acts(buttons);
-  }
-  function clearSide(i, side) {
-    goTo(i, true);
-    commit('remover fotos', () => { const p = app().pages[i]; p[side + 'Images'] = []; p[side + 'Image'] = ''; p[side + 'Annotations'] = []; p[side + 'PhotoTransforms'] = []; });
-    return `<p>🗑 Excluí as fotos do lado ${side === 'left' ? 'correto' : 'incorreto'}.</p>`;
-  }
-  function askDeleteElements(i, filter) {
-    goTo(i, true);
-    const labels = (typeof LABEL_PRESETS !== 'undefined' ? LABEL_PRESETS : []).map(l => l.text);
-    let list = elems(app().pages[i]);
-    if (filter === 'etiqueta') list = list.filter(e => e.type === 'text' && labels.includes(e.text));
-    else if (filter === 'texto') list = list.filter(e => e.type === 'text' && !labels.includes(e.text));
-    else if (filter === 'foto') list = list.filter(e => e.type === 'image');
-    if (!list.length) return `<p>Não há ${filter === 'etiqueta' ? 'etiquetas' : filter === 'texto' ? 'caixas de texto' : filter === 'foto' ? 'figuras livres' : 'elementos livres'} no ${slideRef(i)}.</p>`;
-    const sel = typeof floatState !== 'undefined' ? floatState.selected : null;
-    const name = e => e.type === 'image' ? '🖼️ Figura livre' : e.type === 'emoji' ? (e.ch || '🙂') + ' Emoji' : '🔤 “' + String(e.text || '').split('\n')[0].slice(0, 24) + (String(e.text || '').length > 24 ? '…' : '') + '”';
-    const buttons = list.map(e => act('🗑 ' + esc(name(e)) + (e.id === sel ? ' (selecionado)' : ''), b => { b.disabled = true; deleteFloat(e.id); return `<p>Excluí ${esc(name(e))}.</p>`; }));
-    if (list.length > 1) buttons.push(act(`Excluir todos (${list.length})`, b => { lock(b); const ids = list.map(e => e.id); floatMutate('excluir elementos', l => { for (let k = l.length - 1; k >= 0; k--) if (ids.includes(l[k].id)) l.splice(k, 1); }); return `<p>🗑 Excluí ${ids.length} elemento(s).</p>`; }, 'dan'));
-    return `<p>Qual destes você quer <b>excluir</b> do ${slideRef(i)}?</p>` + acts(buttons);
-  }
-
-  /* ---- Perguntas quando o pedido não está claro ---- */
-  function slideMenu(i) {
-    const P = app().pages, p = P[i];
-    return `<p>O que você quer fazer com o ${slideRef(i)}?</p>` + acts([
-      act('➡️ Ir para ele', () => goTo(i), 'pri'),
-      hidden(p) ? act('👁 Exibir', () => setHidden(i, false)) : act('🙈 Ocultar', () => setHidden(i, true)),
-      act('⧉ Duplicar', () => { goTo(i, true); duplicatePage(); return `<p>⧉ Dupliquei. Agora você está no ${slideRef(currentPage)}.</p>`; }),
-      act('🔁 Mudar o tipo', () => { goTo(i, true); return kindMenu(); }),
-      !hidden(p) && act('⏸ Pausar na TV', () => { panelClose(); presentFixedPage(i); return ''; }),
-      act('🗑 Excluir', () => confirmDeleteSlides([i]), 'dan')]);
-  }
-  function kindMenu() {
-    return `<p>Para qual <b>tipo de layout</b> mudo o slide ${currentPage + 1}?</p>` + acts(['compare', 'only-correct', 'only-incorrect', 'text', 'split', 'image'].map(k => act(esc(kindLabel(k)), () => changeKind(k))));
-  }
-  function clarify(t, raw) {
-    const cmd = commandIn(t), objs = objectsIn(t);
-    const cur = currentPage, list = slideList(t, cmd === 'excluir' || cmd === 'ocultar' || cmd === 'exibir' || cmd === 'duplicar');
-    const vague = /\b(isso|isto|aquilo|ele|ela|tudo)\b/.test(t);
-    const selected = typeof floatState !== 'undefined' && floatState.selected;
-    if (cmd === 'excluir') {
-      if (objs.includes('marcacao')) return '<p>Marcações ficam dentro da foto: passe o mouse na foto, clique em <b>✎</b>, selecione a marcação e use <b>Excluir formato</b>. Para marcas que já vieram na foto, use <b>▧ Apagar antigas</b>.</p>';
-      if (/\b(oculto|ocultos|escondido|escondidos)\b/.test(t)) {
-        const hid = app().pages.map((p, i) => hidden(p) ? i : -1).filter(i => i >= 0);
-        return hid.length ? confirmDeleteSlides(hid) : '<p>Não há slides ocultos.</p>';
-      }
-      if (objs.includes('etiqueta')) return askDeleteElements(list[0] ?? cur, 'etiqueta');
-      if (objs.includes('elemento') || (vague && selected)) return askDeleteElements(list[0] ?? cur, null);
-      if (objs.includes('texto')) return askDeleteElements(list[0] ?? cur, 'texto');
-      if (objs.includes('foto')) return /\blivre|logo|icone\b/.test(t) ? askDeleteElements(list[0] ?? cur, 'foto') : askDeletePhotos(list[0] ?? cur);
-      if (/\b(todos|todas|tudo)\b/.test(t) && /\b(slide|slides)\b/.test(t)) return '<p>Não dá para excluir todos os slides: o projeto precisa de pelo menos um. Quer <b>ocultar</b> alguns ou excluir só os <b>ocultos</b>?</p>' + acts([act('🗑 Excluir os ocultos', () => clarify('excluir slides ocultos'))]);
-      if (list.length && (/\bslide/.test(t) || /\b(o|a|os|as|numero)\s+\d/.test(t) || /\b(do|de|entre)\s+\d{1,3}\s+(ao|a|ate|e)\s+\d{1,3}\b/.test(t))) return confirmDeleteSlides(list, !/\bslide/.test(t));
-      if (/\b(este|esse|atual|deste|desse)\b/.test(t) && /\bslide/.test(t)) return confirmDeleteSlides([cur]);
-      if (/\bslide/.test(t)) return confirmDeleteSlides([cur]);
-      // Sem alvo: pergunta.
-      return `<p>O que você quer <b>excluir</b>?</p>` + acts([
-        act(`📄 O slide ${cur + 1} (atual)`, () => confirmDeleteSlides([cur])),
-        act('🖼️ Fotos deste slide', () => askDeletePhotos(cur)),
-        act('🔤 Textos, etiquetas ou emojis', () => askDeleteElements(cur, null)),
-        act('✎ Marcações da foto', () => clarify('excluir marcacao')),
-        act('🙈 Slides ocultos', () => clarify('excluir slides ocultos'))]) + '<p style="opacity:.8">Dica: diga, por exemplo, “excluir slide 3” ou “excluir slides 2 e 4”.</p>';
-    }
-    if ((cmd === 'ocultar' || cmd === 'exibir') && list.length > 1) {
-      const want = cmd === 'ocultar'; const out = list.map(i => setHidden(i, want)).join('');
-      return out;
-    }
-    if (cmd === 'exibir' && list.length === 1 && !hidden(app().pages[list[0]])) { goTo(list[0], true); return `<p>O ${slideRef(list[0])} já está visível na apresentação; abri ele para você.</p>`; }
-    if ((cmd === 'ocultar' || cmd === 'exibir') && !list.length && !/\bslide/.test(t) && !objs.length)
-      return `<p>Quer <b>${cmd}</b> o slide ${cur + 1} (atual)?</p>` + acts([act(`Sim, ${cmd} o slide ${cur + 1}`, b => { lock(b); return setHidden(cur, cmd === 'ocultar'); }, 'pri'), act('Escolher outro slide', b => { lock(b); return `<p>Diga o número, por exemplo: “${cmd} slide 3”.</p>`; })]);
-    if (cmd === 'duplicar' && !objs.length && !list.length)
-      return `<p>Quer <b>duplicar</b> o slide ${cur + 1} (atual)?</p>` + acts([act(`Sim, duplicar o slide ${cur + 1}`, b => { lock(b); duplicatePage(); return `<p>⧉ Dupliquei. Agora você está no ${slideRef(currentPage)}.</p>`; }, 'pri'),
-        selected && act('Duplicar o elemento selecionado', b => { lock(b); duplicateFloat(floatState.selected); return '<p>⧉ Dupliquei o elemento selecionado.</p>'; })]);
-    if (cmd === 'mudar' && (!objs.length || (vague && objs.length <= 1 && objs[0] === 'slide')))
-      return `<p>O que você quer <b>mudar</b> no slide ${cur + 1}?</p>` + acts([act('🔁 Tipo de layout', kindMenu, 'pri'), act('🎨 Cores', () => answer('mude as cores')), act('🔠 Fonte', () => kbAnswer(kbBy('Fontes'))), act('✏️ Título', () => `<p>Diga o novo título assim: <code>título: USO DE LUVAS</code></p>`), act('⏱ Intervalo', () => '<p>Diga, por exemplo: <code>intervalo 15</code></p>')]);
-    if (cmd === 'gerar' && !objs.length)
-      return '<p>O que você quer <b>gerar</b>?</p>' + acts([act('🎬 Vídeo MP4', () => preMp4(), 'pri'), act('📊 PowerPoint', () => { openExport('pptExportBtn', 'PowerPoint'); return ''; }), act('🖼️ Fotos para TV', () => { openExport('tvUsbPhotosBtn', 'fotos'); return ''; }), act('🖨 PDF', () => { byId('printBtn')?.click(); return ''; }), act('➕ Novo slide', () => newPage('', null))]);
-    if (cmd === 'colocar' && !objs.length)
-      return `<p>O que você quer <b>inserir</b> no slide ${cur + 1}?</p>` + acts([act('📷 Fotos do lado correto', () => pickPhotos('left'), 'pri'), act('📷 Fotos do lado incorreto', () => pickPhotos('right')), act('🧩 Figura livre', pickFloatFigure), act('🔤 Texto', () => addFreeText('')), act('🏷️ Etiqueta', () => '<p>Qual etiqueta?</p>' + acts(labelButtons()))]);
-    if (cmd === 'organizar' && !objs.length)
-      return '<p>O que você quer <b>organizar</b>?</p>' + acts([act('🧹 Texto deste slide em tópicos', () => organizeText(cur), 'pri'), act('📦 Slides ocultos no final', moveHiddenToEnd), act('🔠 Títulos em maiúsculas', upperTitles), act('🔎 Analisar todos os slides', analysisHtml)]);
-    if (cmd === 'criar' && !objs.length)
-      return '<p>O que você quer <b>criar</b>?</p>' + acts([act('➕ Novo slide', () => newPage('', null), 'pri'), act('🔤 Caixa de texto', () => addFreeText('')), act('🏷️ Etiqueta', () => '<p>Qual etiqueta?</p>' + acts(labelButtons()))]);
-    if (cmd === 'pausar' && !list.length)
-      return `<p>Em qual slide <b>pauso</b> a apresentação?</p>` + acts([act(`⏸ No slide ${cur + 1} (atual)`, () => { if (hidden(app().pages[cur])) return '<p>Este slide está oculto; exiba-o antes.</p>'; panelClose(); presentFixedPage(cur); return ''; }, 'pri')]) + '<p style="opacity:.8">Ou diga: “pausar no slide 3”.</p>';
-    // Só o slide, sem dizer o que fazer: "slide 3", "e o 5?"
-    if (!cmd && /^(o |a |e o |e a )?(slide|slides)\s*\d{1,3}\s*\??$/.test(t)) { const i = slideList(t)[0]; if (i !== undefined) return slideMenu(i); }
-    if (!cmd && /^(fotos?|figuras?|imagens?)\s*\??$/.test(t)) return `<p>O que fazer com as <b>fotos</b> do slide ${cur + 1}?</p>` + acts([act('📷 Inserir fotos', () => answer('inserir foto'), 'pri'), act('🗑 Excluir fotos', () => askDeletePhotos(cur)), act('✋ Enquadrar', () => kbAnswer(kbBy('Enquadrar a foto'))), act('✎ Marcar ponto', () => kbAnswer(kbBy('Marcar pontos na foto')))]);
-    return null;
-  }
-  function commandsHtml() {
-    return '<p><b>Comandos que eu entendo</b> (e os sinônimos que aceito):</p><ul>' +
-      COMMANDS.map(c => `<li><b>${esc(c.label)}</b>: ${esc(c.syn)}</li>`).join('') + '</ul><p><b>Alvos</b>:</p><ul>' +
-      OBJECTS.map(o => `<li><b>${esc(o.label)}</b>: ${esc(o.syn)}</li>`).join('') +
-      '</ul><p>Posso entender listas (“slides 2, 3 e 5”, “do 2 ao 4”), “este slide”, “último slide” e erros de digitação comuns. Quando não tiver certeza, eu pergunto.</p>';
   }
 
   /* ---------------- Entendimento das mensagens ---------------- */
@@ -10933,17 +10706,19 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     return null;
   }
   const explicitIndex = t => /(slide|pagina|pag|tela)s?\s*(n|numero|no)?\s*\d|\d\s*(o|a)?\s*(slide|pagina)|(slide|pagina)\s+(um|uma|dois|duas|tres|quatro|cinco|seis|sete|oito|nove|dez)\b|(primeir|segund|terceir|quart|quint|sexto|setimo|oitavo|nono|decimo|ultim)\w*\s+(slide|pagina)/.test(t) ? slideIndex(t) : null;
-  const imperative = t => /\b(gere|gera|gerar|exporte|exporta|exportar|faca|faz|fazer|crie|cria|criar|abra|abre|abrir|inicie|inicia|iniciar|coloque|coloca|colocar|insira|insere|inserir|adicione|adiciona|adicionar|incluir|inclua|inclui|bota|bote|botar|poe|ponha|por|mude|muda|mudar|troque|troca|trocar|aplique|aplica|aplicar|oculte|oculta|ocultar|esconda|esconde|esconder|exclua|exclui|excluir|apague|apaga|apagar|deletar|delete|remova|remover|va|vai|ir|mostre|mostra|duplique|duplica|duplicar|pause|pausa|pausar|toque|toca|tocar|organize|organiza|organizar|formate|formata|formatar|padronize|padroniza|padronizar|renomeie|renomear|analise|analisa|analisar|revise|revisa|revisar|verifique|verifica|verificar|exibir|exiba|excluir|pause|quero|preciso|pode|poderia)\b/.test(t);
+  const imperative = t => /\b(gere|gera|gerar|exporte|exporta|exportar|faca|faz|fazer|crie|cria|criar|abra|abre|abrir|inicie|inicia|iniciar|coloque|coloca|colocar|insira|insere|inserir|adicione|adiciona|adicionar|incluir|inclua|inclui|bota|bote|botar|poe|ponha|por|mude|muda|mudar|troque|troca|trocar|aplique|aplica|aplicar|oculte|oculta|ocultar|esconda|esconde|esconder|exclua|exclui|excluir|apague|apaga|apagar|deletar|delete|remova|remover|va|vai|ir|mostre|mostra|duplique|duplica|duplicar|pause|pausa|pausar|toque|toca|tocar|organize|organiza|organizar|formate|formata|formatar|padronize|padroniza|padronizar|renomeie|renomear|analise|analisa|analisar|revise|revisa|revisar|verifique|verifica|verificar|quero|preciso|pode|poderia)\b/.test(t);
   const request = t => /\b(gere|gera|exporte|exporta|faca|faz|crie|cria|abra|abre|inicie|inicia|coloque|coloca|insira|insere|adicione|adiciona|inclua|inclui|bota|bote|poe|ponha|mude|muda|troque|troca|aplique|aplica|oculte|oculta|esconda|esconde|exclua|exclui|apague|apaga|delete|remova|va|vai|mostre|mostra|duplique|duplica|pause|pausa|toque|toca|organize|organiza|formate|formata|padronize|padroniza|renomeie|analise|analisa|revise|revisa|verifique|verifica|quero|preciso|pode|poderia|por favor|favor)\b/.test(t);
-  let lastRaw = '';
-  const question = t => asksHow(t) && !request(lastRaw || t);
-  const asksHow = t => /\b(como|onde|qual|quais|quant[oa]s?|devo|ideal|vale a pena|e melhor|o que e|oque|pra que|para que|por que|porque|explica|explique|duvida|serve|funciona)\b/.test(t);
+  const asksHow = t => /\b(como|onde|qual|quais|quant[oa]s?|devo|ideal|vale a pena|e melhor|o que e|oque|pra que|para que|por que|porque|explica|explique|duvida|serve|funciona|significa|existe|tem como|da pra|da para|e possivel|consigo|possivel)\b/.test(t);
+  const trouble = t => /\bnao (consigo|consegui|funciona|funcionou|aparece|apareceu|abre|abriu|toca|tocou|sai|saiu|entra|entrou|carrega|carregou|grava|gravou|salva|salvou|sincroniza|mostra|acho|encontro|reproduz|deu)\b|\btrav(ou|ado|ada)\b|\bsumi(u|ram)\b|\bdeu erro\b|\bficou (cortad|estranh|pequen|borrad|pixelad|escur|tort|esticad|deformad)|\bsaiu (em |como )?webm\b|\berro (ao|no|na)\b/.test(t);
+  const politeReq = t => /^(por favor |pf |pfv )?(pode|poderia|consegue|voce pode|me ajuda a|quero que|preciso que)\b/.test(t) && !/\b(como|onde|qual|quais)\b/.test(t);
+  const question = (t, raw) => !politeReq(t) && (/\?\s*$/.test(String(raw || '')) || /^(como|onde|qual|quais|quant[oa]s?|o que|oque|por que|porque|pra que|para que|tem como|da pra|da para|e possivel|posso|consigo|existe|serve|devo|vale|sera)\b/.test(t) || (asksHow(t) && !request(t)) || (/\b(como|onde|qual|quais)\b/.test(t) && !startsImperative(t)) || trouble(t));
+  const startsImperative = t => /^(por favor )?(gere|gera|exporte|faca|crie|cria|abra|inicie|coloque|insira|adicione|inclua|bote|ponha|mude|troque|aplique|oculte|esconda|exclua|apague|delete|remova|va|mostre|duplique|pause|toque|organize|formate|padronize|renomeie|analise|revise|verifique)\b/.test(t);
 
   const INTENTS = [
     {test:t => /^(oi|ola|bom dia|boa tarde|boa noite|e ai|hey|opa)\b/.test(t) && t.length < 25, run:() => welcome(true)},
-    {test:t => /(obrigad|valeu|show|perfeito|otimo|top)\b/.test(t) && t.length < 30, run:() => '<p>Por nada! Se quiser, analiso os slides de novo ou gero o MP4. 🧠</p>'},
+    {test:t => /\b(obrigad[oa]s?|obg|valeu|vlw|show|perfeito|otimo|top|beleza|massa)\b/.test(t) && t.length < 30, run:() => '<p>Por nada! Se quiser, analiso os slides de novo ou gero o MP4. 🧠</p>'},
     {test:t => /(o que (voce|vc) (faz|sabe)|ajuda|comandos|como (te )?usar|o que posso pedir|menu)/.test(t) && t.length < 40, run:() => helpHtml()},
-    {test:t => /(analis|revis|verifi[cq]|avali|diagnost|\bchec|qualidade|\bnota\b|pontua|corrig|problema|\berros?\b)/.test(t) && !/(apagar antigas|marcac)/.test(t) && !/\bmp4\b/.test(t), run:() => analysisHtml()},
+    {test:t => /(analis|revis|verific|avali|diagnost|\bchec|qualidade|\bnota\b|pontua|corrig|problema|\berros?\b)/.test(t) && !/(apagar antigas|marcac)/.test(t) && !/\bmp4\b/.test(t), run:() => analysisHtml()},
     {test:t => /(resumo|quantos slides|quantas paginas|status do projeto|visao geral)/.test(t), run:() => summaryHtml()},
     {test:t => /(organiz|formata|topico|marcador|bullet)/.test(t) && /(texto|topico|marcador|bullet|frase|escrito)/.test(t), run:t => { const i = slideIndex(t); return organizeText(i === null ? currentPage : i); }},
     {test:t => /(organiz|arrum|ordenar|ordem)/.test(t) && /(oculto|escondid)/.test(t), run:() => moveHiddenToEnd()},
@@ -10966,7 +10741,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
       if (hit && imperative(t)) return addLabel(hit);
       return '<p>Qual etiqueta coloco no slide ' + (currentPage + 1) + '? Use no máximo 1 ou 2 por slide.</p>' + acts(labelButtons());
     }},
-    {test:t => /(mud|tro[cq]|transform|vir|deix|tipo|layout|usar|use|colo[cq])/.test(t) && /(texto livre|so (as )?figura|so (as )?imagem|tela cheia|figura (\+|e|com) texto|tela dividida|dividid|so o correto|so correto|apenas o correto|so o incorreto|so incorreto|apenas o incorreto|correto x incorreto|comparacao|comparativo|pagina de video|tipo video|para video)/.test(t), run:t => {
+    {test:t => /(mud|troc|transform|vir|deix|tipo|layout|usar|use|coloc)/.test(t) && /(texto livre|so (as )?figura|so (as )?imagem|tela cheia|figura (\+|e|com) texto|tela dividida|dividid|so o correto|so correto|apenas o correto|so o incorreto|so incorreto|apenas o incorreto|correto x incorreto|comparacao|comparativo|pagina de video|tipo video|para video)/.test(t), run:t => {
       const k = /texto livre/.test(t) ? 'text' : /(figura (\+|e|com) texto|tela dividida|dividid)/.test(t) ? 'split' : /(so (as )?figura|so (as )?imagem|tela cheia)/.test(t) ? 'image'
         : /(so o incorreto|so incorreto|apenas o incorreto)/.test(t) ? 'only-incorrect' : /(so o correto|so correto|apenas o correto)/.test(t) ? 'only-correct' : /(video)/.test(t) ? 'video' : 'compare';
       const i = slideIndex(t); if (i !== null && i !== currentPage) goTo(i, true); return changeKind(k);
@@ -10984,22 +10759,22 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
       return `<p>Onde coloco a figura no slide ${currentPage + 1} (${esc(kindLabel(k))})?</p>` + acts(opts) +
         '<p>Use <b>fotos do lado</b> para a regra em si e <b>figura livre</b> para logos, ícones e placas.</p>';
     }},
-    {test:t => /(texto|caixa de texto|frase)/.test(t) && /(adicion|cri|nov|colo[cq]|insir|insere|inserir|bot|ponha|escrev)/.test(t) && !/(titul)/.test(t), run:(t, raw) => {
+    {test:t => /(texto|caixa de texto|frase)/.test(t) && /(adicion|cri|nov|coloc|insir|insere|inserir|bot|ponha|escrev)/.test(t) && !/(titul)/.test(t), run:(t, raw) => {
       const m = raw.match(/(?:texto|frase)\s*(?:com|dizendo|escrito|:)\s*["“]?(.+?)["”]?$/i); return addFreeText(m ? m[1].trim() : '');
     }},
     {test:t => /(titul|renome)/.test(t) && /(para|:|=|seja|chamad)/.test(t) && imperative(t) || /^titulo\s*:/.test(t), run:(t, raw) => {
       const m = raw.match(/(?:t[ií]tulo|renome\w*)[^:]*?(?:para|:|=|seja|chamad[oa])\s*(.+)$/i); const i = slideIndex(t);
       return setTitle(i === null ? currentPage : i, m ? m[1] : '');
     }},
-    {test:t => /(duplic|dupliq|copia|clon)/.test(t) && /(slide|pagina|este|esse)/.test(t), run:t => { const i = slideIndex(t); if (i !== null) goTo(i, true); duplicatePage(); return `<p>⧉ Dupliquei. Agora você está no ${slideRef(currentPage)}.</p>`; }},
-    {test:t => !question(t) && /(exclu|apag|delet|remov|tira)/.test(t) && /(slide|pagina)/.test(t) && !/(foto|imagem|figura|texto|elemento|marcac)/.test(t), run:t => {
+    {test:t => /(duplic|copia|clon)/.test(t) && /(slide|pagina|este|esse)/.test(t), run:t => { const i = slideIndex(t); if (i !== null) goTo(i, true); duplicatePage(); return `<p>⧉ Dupliquei. Agora você está no ${slideRef(currentPage)}.</p>`; }},
+    {test:t => /(exclu|apag|delet|remov|tira)/.test(t) && /(slide|pagina)/.test(t) && !/(foto|imagem|figura|texto|elemento|marcac)/.test(t), run:t => {
       const i = slideIndex(t); const idx = i === null ? currentPage : i;
       if (!app().pages[idx]) return '<p>Não encontrei esse slide.</p>';
       return `<p>Confirma excluir o ${slideRef(idx)}?</p>` + acts([act('🗑 Sim, excluir', b => { b.parentElement.querySelectorAll('button').forEach(x => x.disabled = true); return deleteAt(idx); }, 'dan'), act('Cancelar', b => { b.parentElement.querySelectorAll('button').forEach(x => x.disabled = true); return '<p>Ok, nada foi excluído.</p>'; })]);
     }},
     {test:t => /(ocult|escond|tira(r)? da apresenta|nao exib)/.test(t) && !/desocult/.test(t) && !/(organiz|arrum|ordem)/.test(t), run:t => { const i = slideIndex(t); return setHidden(i === null ? currentPage : i, true); }},
     {test:t => /(desocult|reexib|volt\w* a (exibir|mostrar)|exib|reativ|mostrar na apresenta)/.test(t) && /(slide|pagina|este|esse)/.test(t), run:t => { const i = slideIndex(t); return setHidden(i === null ? currentPage : i, false); }},
-    {test:t => /(\bpaus|fixar|congel)/.test(t) && explicitIndex(t) !== null, run:t => { const i = explicitIndex(t); if (!app().pages[i]) return '<p>Esse slide não existe.</p>'; if (hidden(app().pages[i])) return '<p>Esse slide está oculto; exiba-o antes.</p>'; panelClose(); presentFixedPage(i); return ''; }},
+    {test:t => /(pausa|pausar|fixar|congel)/.test(t) && explicitIndex(t) !== null, run:t => { const i = explicitIndex(t); if (!app().pages[i]) return '<p>Esse slide não existe.</p>'; if (hidden(app().pages[i])) return '<p>Esse slide está oculto; exiba-o antes.</p>'; panelClose(); presentFixedPage(i); return ''; }},
     {test:t => /(proxim[oa]|seguinte|avanc)/.test(t) && /(slide|pagina)/.test(t), run:() => goTo(Math.min(app().pages.length - 1, currentPage + 1))},
     {test:t => /(anterior|volta(r)? (um|uma|o slide|a pagina))/.test(t), run:() => goTo(Math.max(0, currentPage - 1))},
     {test:t => /\b(ir|va|vai|abr\w*|mostr\w*|leva|edit\w*|quero ver|ver)\b/.test(t) && explicitIndex(t) !== null && !/(ocult|exib)/.test(t), run:t => goTo(explicitIndex(t))},
@@ -11011,87 +10786,462 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
       if (all) { const cur = String(app().pages[currentPage].theme || '') || 'sese'; return applyTheme(cur, true); }
       return '<p>Qual paleta aplico no slide ' + (currentPage + 1) + '? (Para todas, diga “… em todos”.)</p>' + acts(themeButtons(false));
     }},
-    {test:t => !question(t) && ((/(intervalo|tempo de troca|tempo por slide|segundos por|troca a cada|cada slide|por slide|duracao)/.test(t) && /\d+/.test(t)) || (/\d+\s*(s|seg|segundos)\b/.test(t) && /(slide|cada|troca|tempo|intervalo|duracao|velocidade)/.test(t))), run:t => setIntervalSeconds(parseInt(t.match(/\d+/)[0], 10))},
-    {test:t => !/musica/.test(t) && !question(t) && ((/(tv automatica|modo tv|automatic)/.test(t) && imperative(t)) || (/^(apresente|apresentar|inicie|iniciar|inicia|comece|comecar|comeca|rode|rodar|reproduza|play|start)\b/.test(t) && /(apresenta|slides?|tv|agora|^apresent)/.test(t)) || /(apresent(e|a|ar) agora|rodar na tv|passar na tv|passe na tv)/.test(t)), run:t => { panelClose(); (/(automatic|\btv\b)/.test(t) ? byId('autoTvBtn') : byId('tvModeBtn'))?.click(); return ''; }},
-    {test:t => /(music|som de fundo)/.test(t) && /(toc|toque|ouv|ouca|play|liga|pare|para|desliga|proxim|inicie|reproduz)/.test(t) && !question(t), run:t => {
-      const btn = byId('musicPreviewBtn'); const playing = /parar/i.test(btn?.textContent || '');
-      if (/proxim/.test(t)) { byId('musicNextBtn')?.click(); return '<p>⏭ Próxima música.</p>'; }
-      if (/\b(pare|para|parar|desliga|desligue)\b/.test(t)) { if (!playing) return '<p>A música já está parada.</p>'; btn.click(); return '<p>⏹ Parei a música.</p>'; }
-      if (playing) return '<p>A música já está tocando. Diga “pare a música” para parar.</p>';
-      btn?.click(); return '<p>🎵 Tocando a música de fundo.</p>';
-    }},
+    {test:t => /(intervalo|tempo de troca|tempo por slide|segundos por|troca a cada|cada slide)/.test(t) && /\d+/.test(t), run:t => setIntervalSeconds(parseInt(t.match(/\d+/)[0], 10))},
+    {test:t => /(tv automatica|modo tv|automatic)/.test(t) && imperative(t) || /^(iniciar|inicia|comecar|comeca) (a )?apresenta/.test(t) || /(apresent(e|a|ar) agora|rodar na tv|passar na tv)/.test(t), run:t => { panelClose(); (/(automatic|tv)/.test(t) ? byId('autoTvBtn') : byId('tvModeBtn'))?.click(); return ''; }},
+    {test:t => /(music|som de fundo)/.test(t) && /(toc|ouv|play|liga|para|desliga|proxim)/.test(t), run:t => { if (/proxim/.test(t)) { byId('musicNextBtn')?.click(); return '<p>⏭ Próxima música.</p>'; } byId('musicPreviewBtn')?.click(); return `<p>🎵 ${esc(byId('musicPreviewBtn')?.textContent || '')} — use o mesmo comando para alternar.</p>`; }},
     {test:t => /^(desfaz|desfazer|desfaca)\b/.test(t), run:() => { byId('projectUndoBtn')?.click(); return '<p>↶ Desfeito.</p>'; }},
     {test:t => /^(refaz|refazer|refaca)\b/.test(t), run:() => { byId('projectRedoBtn')?.click(); return '<p>↷ Refeito.</p>'; }},
     {test:t => /(backup)/.test(t) && imperative(t) && /(salv|faz|faca|guard)/.test(t), run:() => { byId('saveProjectBtn')?.click(); return '<p>💾 Pedi o backup; uma mensagem vai confirmar.</p>'; }}
   ];
-  function kbAnswer(entry) {
-    const a = typeof entry.a === 'function' ? entry.a() : entry.a;
-    return a + (entry.x ? acts(entry.x()) : '');
+  // Intenções que só informam (podem responder perguntas); as outras executam ações.
+  INTENTS.slice(0, 5).forEach(i => { i.info = true; });
+  INTENTS.splice(5, 0, {test:t => /\bexportar\b/.test(t) && /\b(video|mp4)\b/.test(t) && !/(abertura|no slide|neste slide|nesta pagina|pagina de video)/.test(t), run:() => preMp4()});
+  /* ================================================================
+     ENTENDIMENTO v2 — sinônimos, radicais, erros de digitação,
+     índice automático da tela e “📍 Mostrar onde fica”.
+     ================================================================ */
+  const isMobile = () => matchMedia('(max-width:1024px)').matches;
+  const visible = el => !!el && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden';
+  const STOP = new Set(('a o as os um uma uns umas de do da dos das no na nos nas em num numa para pra pro pros por pelo pela com sem e ou que se eu me mim meu minha meus minhas voce vc voces seu sua isso isto esse essa este esta estes essas ele ela eles elas la aqui ali ai como onde qual quais quando porque quanto quanta ' +
+    'tem ter tenho temos fazer faco faz fazendo consigo posso pode podemos quero queria preciso precisava gostaria saber sobre algum alguma alguns mais muito muita ja sim ao aos tambem entao assim ate depois antes agora favor ola oi ' +
+    'vou vai fica ficar esta estou estao sao ser foi era sera seria dar deixar deixo botao opcao funcao parte lugar coisa jeito modo forma tipo tudo todo toda todos todas cima ta to tô esqueci queria').split(' '));
+  const stem = w => {
+    if (w.length <= 3 || /\d/.test(w)) return w;
+    const r = w.replace(/(acoes|icoes|amentos|imentos|amento|imento|mente|acao|icao|adoras?|adores|ador|ancias?|encias?|idades?|aveis|ivel|avel|ando|endo|indo|ados|idos|adas|idas|ado|ido|ada|ida|aram|eram|iram|asse|esse|isse|ens|aste|amos|emos|imos|ei|ou|iu|eu|ar|er|ir|am|em|as|es|os|is|a|e|o|s)$/, '').replace(/qu$/, 'c').replace(/gu$/, 'g');
+    return r.length >= 3 ? r : w.slice(0, 3);
+  };
+  const tokens = t => norm(t).split(' ').filter(w => w && !STOP.has(w) && (w.length > 1 || /\d/.test(w)));
+  // Grupos de sinônimos: o primeiro termo é o “canônico”.
+  const SYN = [
+    ['foto','fotos','imagem','imagens','figura','figuras','fotografia','print','captura','retrato','jpg','png'],
+    ['slide','slides','pagina','paginas','lamina','laminas','folha','folhas','transparencia','tela'],
+    ['excluir','apagar','deletar','remover','eliminar','tirar','descartar','lixeira','lixo','jogar fora'],
+    ['criar','novo','nova','adicionar','incluir','inserir','acrescentar','colocar','coloco','ponho','poe','por','botar','anexar'],
+    ['exportar','gerar','baixar','download','salvar como','extrair','gravar','mandar','enviar','levar'],
+    ['video','videos','filme','mp4','gravacao','clipe'],
+    ['ocultar','esconder','sumir','invisivel','desativar','nao exibir','nao mostrar','omitir'],
+    ['marcacao','marcar','marcacoes','seta','flecha','circulo','destacar','apontar','sinalizar','desenhar','grifar','realcar','evidenciar','rabiscar'],
+    ['enquadrar','posicionar','recortar','cortar','zoom','aproximar','afastar','crop','ajustar'],
+    ['cor','cores','paleta','tema','colorir','tonalidade','colorido'],
+    ['fonte','fontes','letra','letras','tipografia'],
+    ['musica','musicas','som','audio','trilha','cancao'],
+    ['intervalo','tempo','segundos','duracao','velocidade','demora','rapido','devagar','lento'],
+    ['apresentar','apresentacao','projetar','telao','televisao','monitor','passar','rodar'],
+    ['desfazer','reverter','anular','ctrl z','voltar atras','errei'],
+    ['backup','copia de seguranca','restaurar','recuperar'],
+    ['sincronizar','sincronizacao','nuvem','compartilhar','compartilhado','tempo real','equipe','colegas'],
+    ['titulo','titulos','cabecalho','manchete','nome do slide'],
+    ['texto','textos','escrita','frase','legenda','descricao','paragrafo','escrever','digitar','escrito'],
+    ['etiqueta','etiquetas','selo','selos','tag','faixa','aviso','placa','carimbo'],
+    ['emoji','emojis','emoticon','carinha','figurinha','smile'],
+    ['numero','numeracao','contagem','enumerar','numerar'],
+    ['ordem','reordenar','mover','arrastar','sequencia','trocar de lugar','posicao'],
+    ['duplicar','copiar','clonar','replicar'],
+    ['powerpoint','pptx','ppt','office'],
+    ['pdf','imprimir','impressao','impressora'],
+    ['celular','mobile','telefone','smartphone','android','iphone','tablet'],
+    ['quiosque','sozinha','sozinho','autonomo','loop','ciclo','repetir','continuo'],
+    ['pausar','pausa','fixar','congelar','fixo','parar'],
+    ['abertura','intro','introducao','vinheta'],
+    ['lupa','ampliar','ampliacao','detalhe'],
+    ['transparencia','transparente','opacidade','translucido'],
+    ['girar','rotacionar','rotacao','inclinar','virar'],
+    ['negrito','grosso','destaque no texto'],
+    ['problema','erro','bug','falha','travou','travado','defeito'],
+    ['boas praticas','dica','dicas','recomendacao','recomendacoes','padrao','melhorar','qualidade'],
+    ['visualizar','previa','preview','conferir','pre visualizar'],
+    ['tela escura','modo escuro','dark','noturno'],
+    ['tela dividida','dividir','metade','lado a lado','figura + texto'],
+    ['correto','certo','adequado','permitido'],
+    ['incorreto','errado','inadequado'],
+    ['abrir','acessar','entrar'],
+    ['onde','cade','localizar','encontrar','achar']
+  ];
+  const SYN_OF = new Map();
+  SYN.forEach(group => {
+    const stems = new Set(group.filter(m => !m.includes(' ')).map(stem));
+    group.forEach(m => { if (!m.includes(' ')) { const s = stem(m); SYN_OF.set(s, new Set([...(SYN_OF.get(s) || []), ...stems])); } });
+  });
+  const SYN_PHRASES = SYN.flatMap(group => group.filter(m => m.includes(' ')).map(m => [m, stem(group.find(x => !x.includes(' ')) || group[0])]));
+  // Reescritas seguras para os comandos (antes de procurar a intenção).
+  const REWRITE = [
+    [/\b(baixar|baixe|baixa|salvar|salve|gravar|grave|montar|monte|fazer|faca)\b(?=.*\b(video|mp4|filme)\b)(?!.*\b(abertura|no slide|neste slide|nesta pagina|na pagina)\b)/g, 'exportar'],
+    [/\bfilmes?\b/g, 'video'], [/\bso (a |as |o |os )?(foto|fotos|imagem|imagens|lado|parte|modo) (cert[oa]s?|corret[oa]s?)\b|\bso (o )?certo\b/g, 'so o correto'], [/\bso (a |as |o |os )?(foto|fotos|imagem|imagens|lado|parte|modo) (errad[oa]s?|incorret[oa]s?)\b|\bso (o )?errado\b/g, 'so o incorreto'], [/\bfigura (e|com) texto\b|\b(foto|imagem) (e|com) texto\b/g, 'figura + texto'], [/\blaminas?\b/g, 'slide'], [/\bfotografias?\b/g, 'foto'],
+    [/\b(eliminar|elimine|elimina|descartar|descarte|jogar fora|jogue fora)\b/g, 'excluir'],
+    [/\b(sumir com|some com|suma com)\b/g, 'ocultar'],
+    [/\bcade\b/g, 'onde esta'], [/\b(cmo|cm|comoo|coomo|cono)\b/g, 'como'], [/\b(ond|oonde)\b/g, 'onde'], [/\b(qal|qul)\b/g, 'qual'], [/\bvc\b/g, 'voce'], [/\bpq\b/g, 'por que'], [/\btb\b|\btbm\b/g, 'tambem'],
+    [/\bq\b/g, 'que'], [/\bn\b(?=\s+(consigo|aparece|funciona|abre|sai|toca|carrega))/g, 'nao']
+  ];
+  const rewrite = t => REWRITE.reduce((s, [re, to]) => s.replace(re, to), t).replace(/\s+/g, ' ').trim();
+  const VERBS = 'gerar exportar criar inserir adicionar colocar excluir apagar deletar remover ocultar esconder exibir mostrar duplicar pausar organizar analisar revisar verificar padronizar mudar trocar aplicar abrir apresentar desfazer refazer titulo slide pagina pagina slides intervalo backup etiqueta musica figura imagem foto fotos video powerpoint correto incorreto organize analise exclua oculte'.split(' ');
+
+  /* ----- Índice de texto: base de conhecimento ----- */
+  const stripHtml = h => String(h || '').replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ');
+  let KB_IX = null, VOCAB = null, VOCAB_STEMS = null, KB_DF = new Map();
+  function buildKbIndex() {
+    const df = new Map();
+    const ix = KB.map(entry => {
+      const w = new Map();
+      const put = (txt, wt) => tokens(txt).forEach(tk => { const s = stem(tk); if (wt > (w.get(s) || 0)) w.set(s, wt); });
+      let a = entry.a; if (typeof a === 'function') { try { a = a(); } catch (e) { a = ''; } }
+      put(stripHtml(a), 1); put(entry.q, 2.5); entry.k.forEach(k => put(k, 3));
+      w.forEach((_, s) => df.set(s, (df.get(s) || 0) + 1));
+      return {entry, w, qs: new Set(tokens(entry.q).map(stem)), phrases: entry.k.map(norm), pstems: entry.k.map(k => tokens(k).map(stem))};
+    });
+    const N = ix.length; KB_DF = df;
+    ix.forEach(row => { row.idf = s => Math.log(1 + N / (df.get(s) || N)); });
+    KB_IX = ix;
+  }
+  function buildVocab() {
+    VOCAB = new Map();
+    const add = txt => norm(txt).split(' ').forEach(w => { if (w.length >= 3 && !/\d/.test(w)) VOCAB.set(w, (VOCAB.get(w) || 0) + 1); });
+    KB.forEach(e => { add(e.q); e.k.forEach(add); let a = e.a; if (typeof a === 'function') { try { a = a(); } catch (x) { a = ''; } } add(stripHtml(a)); });
+    SYN.forEach(g => g.forEach(add)); VERBS.forEach(add);
+    uiIndex().forEach(it => add(it.label + ' ' + it.extra));
+    VOCAB_STEMS = new Set([...VOCAB.keys()].map(stem));
+  }
+  // Distância de edição com transposição (Damerau), limitada.
+  function editDistance(a, b, max) {
+    if (Math.abs(a.length - b.length) > max) return max + 1;
+    const d = Array.from({length: a.length + 1}, (_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) d[0][j] = j;
+    for (let i = 1; i <= a.length; i++) {
+      let rowMin = Infinity;
+      for (let j = 1; j <= b.length; j++) {
+        const c = a[i - 1] === b[j - 1] ? 0 : 1;
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
+        if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+        rowMin = Math.min(rowMin, d[i][j]);
+      }
+      if (rowMin > max) return max + 1;
+    }
+    return d[a.length][b.length];
+  }
+  // Corrige palavras com erro de digitação usando o vocabulário da própria ferramenta.
+  function correct(t) {
+    if (!VOCAB) buildVocab();
+    const fixed = [];
+    const out = t.split(' ').map(w => {
+      if (w.length < 4 || /\d/.test(w) || STOP.has(w) || VOCAB.has(w) || VOCAB_STEMS.has(stem(w))) return w;
+      const max = w.length <= 7 ? 1 : 2;
+      let best = null, bestD = max + 1, bestF = 0;
+      VOCAB.forEach((f, v) => {
+        if (Math.abs(v.length - w.length) > max) return;
+        const dd = editDistance(w, v, max);
+        const sameStart = v[0] === w[0];
+        if (dd > max || !sameStart) return;
+        if (dd < bestD || (dd === bestD && f > bestF)) { best = v; bestD = dd; bestF = f; }
+      });
+      if (best && best !== w) { fixed.push(best); return best; }
+      return w;
+    });
+    return {text: out.join(' '), changed: fixed.length > 0};
+  }
+  function queryStems(t) {
+    const list = tokens(t).map(stem);
+    SYN_PHRASES.forEach(([phrase, canon]) => { if (t.includes(phrase)) list.push(canon); });
+    return [...new Set(list)];
   }
   function kbSearch(t) {
-    const words = t.split(' ').filter(w => w.length > 2);
-    let best = null, bestScore = 0;
-    const scored = KB.map(entry => {
+    if (!KB_IX) buildKbIndex();
+    const Q = queryStems(t);
+    const scored = KB_IX.map(row => {
       let score = 0;
-      entry.k.forEach(k => { const nk = norm(k); if (t.includes(nk)) score += 2 + nk.split(' ').length; else { const parts = nk.split(' ').filter(w => w.length > 3); if (parts.length >= 2 && parts.every(p => words.some(w => w.startsWith(p.slice(0, 5))))) score += 1.5; } });
-      return {entry, score};
+      const Qs = new Set(Q);
+      row.phrases.forEach((nk, pi) => {
+        if (!nk) return;
+        if ((' ' + t + ' ').includes(' ' + nk + ' ') || (nk.length > 5 && t.includes(nk))) { score += 2 + nk.split(' ').length; return; }
+        const ps = row.pstems[pi];
+        if (ps.length >= 2 && ps.every(x => Qs.has(x))) score += 1 + ps.length * 0.6;
+      });
+      Q.forEach(s => {
+        const direct = (row.w.get(s) || 0) * row.idf(s);
+        // Sinônimo vale 60%; se a palavra não existe na base, o sinônimo vale quase como a própria palavra.
+        const sf = KB_DF.has(s) ? 0.6 : 0.9;
+        let syn = 0, synTitle = false; (SYN_OF.get(s) || []).forEach(x => { if (x !== s) { syn = Math.max(syn, (row.w.get(x) || 0) * sf * row.idf(x)); if (row.qs.has(x)) synTitle = true; } });
+        // A palavra aparece no título da resposta: sinal forte de que é o assunto.
+        if (row.qs.has(s)) score += 2 * row.idf(s); else if (synTitle) score += 1.2;
+        // Palavras próximas: mesmo começo (export → exportar, sincron → sincronizar).
+        let near = 0; if (!direct && s.length >= 5) row.w.forEach((wt, x) => { if (x.length >= 5 && (x.startsWith(s.slice(0, 5)) || s.startsWith(x.slice(0, 5)))) near = Math.max(near, wt * 0.5 * row.idf(x)); });
+        score += Math.max(direct, syn, near);
+      });
+      // Respostas de “problema” só ganham força quando a pessoa relata um problema.
+      if (row.entry.trouble && !trouble(t) && !/\b(problema|erro|falha|nao)\b/.test(t)) score *= 0.6;
+      return {entry: row.entry, score};
     }).sort((a, b) => b.score - a.score);
-    if (scored[0] && scored[0].score > 0) { best = scored[0].entry; bestScore = scored[0].score; }
-    return {best, bestScore, others: scored.filter(s => s.score >= 3).slice(1, 4).map(s => s.entry)};
+    const top = scored[0];
+    return {best: top && top.score > 0 ? top.entry : null, bestScore: top ? top.score : 0, ranked: scored,
+      others: scored.slice(1).filter(s => top && s.score >= Math.max(3, top.score * 0.45)).slice(0, 3).map(s => s.entry)};
   }
+
+  /* ----- Índice automático da tela (todos os botões, campos e títulos) ----- */
+  const DIALOG_HOW = {
+    annotationDialog: {how:'no <b>editor de marcações</b>: passe o mouse na foto e clique em <b>✎</b>', sel:['#leftGallery img','#rightGallery img','#leftCard'], tip:'✎ na foto'},
+    photoPositionDialog: {how:'na janela <b>Posicionar foto</b>: passe o mouse na foto e clique em <b>✋</b>', sel:['#leftGallery img','#rightGallery img','#leftCard'], tip:'✋ na foto'},
+    orientationDialog: {how:'na pergunta “Como deseja apresentar?”, que aparece ao tocar em <b>Apresentação</b> no celular', sel:'#tvModeBtn', tip:'Apresentação'},
+    newPageDialog: {how:'na janela <b>Nova página</b>, aberta pelo botão <b>+ Nova</b>', sel:'#newPageBtn', tip:'+ Nova'},
+    presentationIntro: {how:'durante o <b>vídeo de abertura</b> da apresentação', sel:'#autoTvBtn', tip:'TV automática'},
+    presentationHud: {how:'durante a <b>apresentação em tela cheia</b>', sel:'#tvModeBtn', tip:'Apresentação'}
+  };
+  const containerOf = el => el.closest('dialog,#presentationIntro,#presentationHud');
+  function groupName(el) {
+    const dlg = containerOf(el);
+    if (dlg) { const h = dlg.querySelector('h2'); return h ? h.textContent.trim() : (dlg.getAttribute('aria-label') || 'janela'); }
+    const g = el.closest('.group'); if (g) { const h = g.querySelector('h2'); if (h) return h.textContent.replace(/\s+\d+\s*$/, '').trim(); }
+    if (el.closest('#previewPane')) return 'Visualização da apresentação';
+    if (el.closest('.sidebar,aside,nav.mobile-tabs')) return 'menu lateral';
+    if (el.closest('#slide')) return 'área do slide';
+    if (el.closest('.top-actions,.hero,header')) return 'barra superior';
+    if (el.closest('.project-history')) return 'topo da tela';
+    if (el.closest('#syncBar')) return 'barra de sincronização';
+    return 'tela principal';
+  }
+  const labelOf = el => {
+    const own = (el.getAttribute('aria-label') || '').trim();
+    let txt = (el.matches('input,select,textarea') ? '' : el.textContent || '').replace(/\s+/g, ' ').trim();
+    if (el.matches('input[type=checkbox],input[type=radio]')) { const l = el.closest('label'); if (l) txt = l.textContent.replace(/\s+/g, ' ').trim(); }
+    if (el.id && !txt) { const l = document.querySelector(`label[for="${el.id}"]`); if (l) txt = l.textContent.trim(); }
+    return (txt.length >= 2 && txt.length <= 90 ? txt : '') || own || (el.title || '').trim() || (el.placeholder || '').trim();
+  };
+  let UI_CACHE = null, UI_AT = 0;
+  function uiIndex() {
+    if (UI_CACHE && Date.now() - UI_AT < 4000) return UI_CACHE;
+    const seen = new Set(), out = [];
+    document.querySelectorAll('button,label,h2,h3,select,textarea,input:not([type=hidden]):not([type=file]),[title],[aria-label],.hint').forEach(el => {
+      if (el.closest('#brainPanel,#brainFab,#brainSpotTip,#kioskSplash,#syncGate,script,style,#pagesList .page-thumb')) return;
+      if (el.matches('label') && el.querySelector('input,select,textarea')) return; // o campo dentro já entra
+      const label = labelOf(el); if (!label || label.length < 2) return;
+      const extra = [el.title, el.getAttribute('aria-label'), el.placeholder].filter(Boolean).join(' ');
+      const group = groupName(el);
+      const key = norm(label) + '|' + group; if (seen.has(key)) return; seen.add(key);
+      const w = new Map();
+      const put = (txt, wt) => tokens(txt).forEach(tk => { const s = stem(tk); if (wt > (w.get(s) || 0)) w.set(s, wt); });
+      put(group, 0.8); put(extra, 2); put(label, 3);
+      out.push({el, label, extra, group, w, hint: el.matches('.hint,p')});
+    });
+    UI_CACHE = out; UI_AT = Date.now();
+    return out;
+  }
+  function uiSearch(t) {
+    const Q = queryStems(t); if (!Q.length) return [];
+    return uiIndex().map(it => {
+      let score = 0, hits = 0;
+      Q.forEach(s => {
+        const direct = it.w.get(s) || 0;
+        let syn = 0; (SYN_OF.get(s) || []).forEach(x => { if (x !== s) syn = Math.max(syn, (it.w.get(x) || 0) * 0.6); });
+        const v = Math.max(direct, syn); if (v) hits++; score += v;
+      });
+      if (it.hint) score *= 0.7;
+      return {it, score: score * (hits / Q.length + 0.25), hits};
+    }).filter(r => r.hits > 0).sort((a, b) => b.score - a.score).slice(0, 4);
+  }
+
+  /* ----- 📍 Mostrar onde fica (destaca o controle na tela) ----- */
+  const spotCss = document.createElement('style');
+  spotCss.id = 'seseBrainSpotStyles';
+  spotCss.textContent = `.brain-spot{outline:3px solid #f4bf12!important;outline-offset:3px!important;animation:brainSpot .8s ease-in-out 0s 6 alternate!important;scroll-margin:110px}
+  @keyframes brainSpot{from{box-shadow:0 0 0 0 rgba(244,191,18,0)}to{box-shadow:0 0 0 7px rgba(244,191,18,.5),0 0 26px 6px rgba(192,38,211,.55)}}
+  #brainSpotTip{position:fixed;z-index:9003;max-width:290px;background:#6d28d9;color:#fff;font:700 13px/1.35 Montserrat,Arial,sans-serif;padding:9px 12px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer}
+  #brainSpotTip small{display:block;font-weight:500;opacity:.85;margin-top:3px;font-size:11px}
+  #brainSpotTip::before{content:"";position:absolute;left:var(--ax,24px);width:12px;height:12px;background:#6d28d9;transform:rotate(45deg)}
+  #brainSpotTip[data-pos="below"]::before{top:-6px}#brainSpotTip[data-pos="above"]::before{bottom:-6px}
+  .bm .b-fix{font-size:11px;opacity:.75;margin:0 0 4px}
+  @media (prefers-reduced-motion:reduce){.brain-spot{animation:none!important}}
+  @media print{#brainSpotTip{display:none!important}}`;
+  document.head.appendChild(spotCss);
+  let spotEl = null, spotTimer = 0, spotTip = null;
+  function clearSpot() {
+    clearTimeout(spotTimer);
+    if (spotEl) spotEl.classList.remove('brain-spot');
+    if (spotTip) spotTip.remove();
+    spotEl = spotTip = null;
+    window.removeEventListener('scroll', placeTip, true); window.removeEventListener('resize', placeTip);
+  }
+  function placeTip() {
+    if (!spotEl || !spotTip) return;
+    const r = spotEl.getBoundingClientRect(), tw = spotTip.offsetWidth, th = spotTip.offsetHeight;
+    const below = r.bottom + th + 14 < innerHeight;
+    const top = below ? r.bottom + 10 : Math.max(6, r.top - th - 10);
+    const left = Math.max(8, Math.min(innerWidth - tw - 8, r.left + Math.min(r.width / 2, 60) - 24));
+    spotTip.dataset.pos = below ? 'below' : 'above';
+    spotTip.style.top = top + 'px'; spotTip.style.left = left + 'px';
+    spotTip.style.setProperty('--ax', Math.max(10, Math.min(tw - 22, r.left + Math.min(r.width / 2, 60) - left - 6)) + 'px');
+  }
+  function spotlight(el, tip, sub) {
+    clearSpot();
+    spotEl = el; el.classList.add('brain-spot');
+    try { el.scrollIntoView({block:'center', inline:'nearest', behavior:'smooth'}); } catch (e) { el.scrollIntoView(); }
+    spotTip = document.createElement('div'); spotTip.id = 'brainSpotTip'; spotTip.setAttribute('role', 'status');
+    spotTip.innerHTML = '📍 ' + esc(tip) + (sub ? `<small>${esc(sub)}</small>` : '') + (isMobile() ? '<small>Toque no 🧠 para voltar ao assistente.</small>' : '');
+    spotTip.addEventListener('click', clearSpot);
+    document.body.appendChild(spotTip);
+    placeTip(); setTimeout(placeTip, 380); setTimeout(placeTip, 800);
+    window.addEventListener('scroll', placeTip, true); window.addEventListener('resize', placeTip);
+    spotTimer = setTimeout(clearSpot, 8000);
+  }
+  const mobileTabOf = el => el.closest('#mobile-panel-project') ? 'project' : el.closest('[data-mobile-panel]') ? el.closest('[data-mobile-panel]').dataset.mobilePanel : el.closest('#mobile-panel-text') ? 'text' : el.closest('#mobile-panel-view') ? 'view' : null;
+  const HIDDEN_WHY = {
+    splitOptions: 'split', freeTextOptions: 'split', textLayoutOptions: 'text', figureFullRow: 'image'
+  };
+  function hiddenReason(el) {
+    for (const [id, kind] of Object.entries(HIDDEN_WHY)) {
+      const box = byId(id);
+      if (box && box.contains(el) && box.hidden) return `<p>Essa opção só aparece quando a página é <b>${esc(kindLabel(kind))}</b>. Esta página é “${esc(kindLabel(kindOf(app().pages[currentPage])))}”.</p>` + acts([act(`🔁 Mudar esta página para ${esc(kindLabel(kind))}`, () => changeKind(kind) + showWhere({el}, {quiet:false}), 'pri')]);
+    }
+    const fo = byId('figureOptions');
+    if (fo && fo.contains(el) && fo.hidden) return '<p>O encaixe das fotos não aparece em páginas <b>Texto livre</b> e <b>Vídeo</b>, porque elas não têm quadro de foto.</p>';
+    const fp = byId('floatPanelGroup');
+    if (fp && fp.contains(el) && fp.hidden) return '<p>O bloco <b>Ajustar elemento selecionado</b> aparece quando você <b>clica numa figura, texto ou emoji livre</b> no slide. Se ainda não tem nenhum, crie em “Figuras, textos e emojis livres”.</p>' + acts([act('🔤 Criar um texto livre', () => addFreeText('')), act('🧩 Pôr figura livre', pickFloatFigure)]);
+    return '';
+  }
+  function showWhere(spec, opts = {}) {
+    if (!spec) return '';
+    if (typeof spec === 'string') spec = {sel: spec};
+    const quiet = !!opts.quiet;
+    if (!quiet && spec.open) { try { spec.open(); } catch (e) {} }
+    let el = spec.el || null, fallback = null;
+    if (!el) for (const s of [].concat(spec.sel || [])) {
+      const c = document.querySelector(s); if (!c) continue;
+      if (visible(c)) { el = c; break; } fallback = fallback || c;
+      // no celular o bloco pode estar em outra aba: guardamos e testamos depois
+    }
+    el = el || fallback;
+    if (!el) return quiet ? '' : '<p>Não encontrei esse controle nesta tela.</p>';
+    const dlg = containerOf(el);
+    if (dlg && !visible(el)) {
+      const how = DIALOG_HOW[dlg.id];
+      if (quiet) return '';
+      if (how) { const r = showWhere({sel: how.sel, tip: how.tip}, {quiet:true}); return `<p>📍 Isso fica ${how.how}.</p>` + (r || '') + (spotEl ? '<p>Destaquei onde começar.</p>' : ''); }
+      return `<p>Isso fica na janela <b>${esc(groupName(el))}</b>.</p>`;
+    }
+    if (el.matches('input[type=checkbox],input[type=radio]') && el.closest('label')) el = el.closest('label');
+    if (isMobile()) {
+      const tab = mobileTabOf(el);
+      if (tab && document.body.dataset.mobileTab !== tab && typeof selectMobileTab === 'function') {
+        if (quiet) return '';
+        try { selectMobileTab(tab); } catch (e) {}
+      }
+    }
+    if (!visible(el)) {
+      if (quiet) return '';
+      return hiddenReason(el) || `<p>Isso fica em <b>${esc(groupName(el))}</b>. Agora não aparece na tela: depende do tipo de página, do tamanho da janela ou de uma janela aberta.</p>`;
+    }
+    if (isMobile() && !quiet) panelClose();
+    const tip = spec.tip || labelOf(el) || 'Aqui';
+    const gname = groupName(el);
+    spotlight(el, tip, norm(gname).includes(norm(tip)) || norm(tip).includes(norm(gname)) ? '' : gname);
+    return quiet ? '' : `<p>📍 Destaquei <b>${esc(tip)}</b>${norm(gname).includes(norm(tip)) ? '' : ' (' + esc(gname) + ')'}.</p>`;
+  }
+  const whereBtn = spec => spec ? act('📍 Mostrar onde fica', () => showWhere(spec)) : '';
+
+  /* ----- Respostas ----- */
+  function kbAnswer(entry, opts = {}) {
+    const a = typeof entry.a === 'function' ? entry.a() : entry.a;
+    let why = '';
+    if (entry.w && entry.w.kind && kindOf(app().pages[currentPage]) !== entry.w.kind) {
+      const k = entry.w.kind;
+      why = `<p>💡 Esta página é “${esc(kindLabel(kindOf(app().pages[currentPage])))}”: essa opção só aparece em <b>${esc(kindLabel(k))}</b>.</p>` + acts([act(`🔁 Mudar esta página para ${esc(kindLabel(k))}`, () => changeKind(k) + showWhere(entry.w), 'pri')]);
+    } else if (opts.auto && entry.w && !isMobile()) setTimeout(() => showWhere(entry.w, {quiet:true}), 320);
+    const buttons = (entry.x ? entry.x() : []).concat(entry.w ? [whereBtn(entry.w)] : []);
+    return a + why + (buttons.length ? acts(buttons) : '');
+  }
+  function uiAnswer(hits, opts = {}) {
+    const [top, ...rest] = hits; const it = top.it;
+    const where = containerOf(it.el) && DIALOG_HOW[containerOf(it.el).id] ? DIALOG_HOW[containerOf(it.el).id].how : `em <b>${esc(it.group)}</b>`;
+    const detail = it.extra && norm(it.extra) !== norm(it.label) ? `<p>${esc(it.extra)}</p>` : '';
+    if (opts.auto && !isMobile()) setTimeout(() => showWhere({el: it.el, tip: it.label}, {quiet:true}), 320);
+    let html = `<p>Na ferramenta, isso é <b>${esc(it.label)}</b>, ${where}.</p>` + detail + acts([act('📍 Mostrar onde fica', () => showWhere({el: it.el, tip: it.label}), 'pri')]);
+    const more = rest.filter(r => r.score >= top.score * 0.5);
+    if (more.length) html += '<p style="margin-top:8px;opacity:.8">Também pode ser:</p>' + acts(more.map(r => act(esc(r.it.label) + ' · ' + esc(r.it.group), () => showWhere({el: r.it.el, tip: r.it.label}))));
+    return html;
+  }
+  function related(list) { return list.length ? '<p style="margin-top:8px;opacity:.8">Relacionado:</p>' + acts(list.map(e => act(esc(e.q), () => kbAnswer(e)))) : ''; }
+  function fallbackHtml(t, kb) {
+    const ideas = kb.ranked.filter(r => r.score > 0).slice(0, 4).map(r => r.entry);
+    return `<p>Não achei uma resposta exata para isso. 🤔</p>` +
+      (ideas.length ? '<p>O mais próximo do que você escreveu:</p>' + acts(ideas.map(e => act(esc(e.q), () => kbAnswer(e, {auto:true})))) : '') +
+      '<p>Dica: diga o que quer fazer e onde (ex.: “como colocar seta na foto”, “onde fica o volume da música”).</p>' +
+      acts([act('🔎 Analisar meus slides', analysisHtml, 'pri'), act('⭐ Boas práticas', () => kbAnswer(kbBy('Boas práticas'))), act('❓ O que você faz?', helpHtml)]);
+  }
+
+  /* ----- Novo slide: todas as formas de pedir uma página nova ----- */
+  const NS_NOUN = '(slides?|paginas?|laminas?|folhas?)';
+  const NS_VERB = /\b(adicion\w*|add|inser\w*|inclu\w*|acrescent\w*|cri(a|ar|e|em|ando)|coloc\w*|bot(a|ar|e|ando)|poe|ponha|por|fa(z|ca|zer)|ger(a|ar|e)|abr(a|e|ir)|mont(a|ar|e)|quero|queria|preciso|precisa|faltam?)\b/;
+  const NS_OTHER = /\b(foto|fotos|imagem|imagens|figura|figuras|texto|textos|etiqueta|selo|emoji|video|musica|titulo|cor|cores|paleta|fonte|numero|marcac\w*|seta|logo|icone|ocult\w*|escond\w*|exclu\w*|apag\w*|delet\w*|remov\w*|tir\w*|duplic\w*|copi\w*|clon\w*|ordem|mov\w*|analis\w*|organiz\w*|intervalo|tela cheia|tipo|layout|mud\w*|troc\w*|pausa\w*|ir|va|vai|proxim\w*|anterior|ultim\w*)\b/;
+  const NS_EXPLICIT = new RegExp('\\b(nov[oa]s?|outr[oa]s?|mais (um|uma|uns|umas|\\d+|dois|duas|tres|quatro|cinco)?\\s*(nov[oa]s? )?)\\s*' + NS_NOUN + '\\b|\\b' + NS_NOUN + ' (nov[oa]s?|em branco|vazi[oa]s?|extras?|a mais)\\b');
+  const NS_BARE = /^(adicionar|adiciona|adicione|add|inserir|insere|insira|incluir|inclui|inclua|criar|cria|crie|acrescentar|acrescente|novo|nova|novos|novas|mais um|mais uma|\+|\+ nova|\+ novo)$/;
+  function wantsNewSlide(t) {
+    if (NS_BARE.test(t)) return true;
+    if (NS_EXPLICIT.test(t)) return !/\b(ir|va|vai|abr\w*|mostr\w*) (para |pro |pra )?(o |a )?(outr[oa]|proxim[oa])\b/.test(t);
+    if (/\b(no|neste|nesse|deste|desse|do|na|nesta|nessa|desta|dessa|da) (slide|pagina)\b|\bso o (in)?correto\b/.test(t)) return false; // mexer no slide atual
+    return new RegExp('\\b' + NS_NOUN + '\\b').test(t) && NS_VERB.test(t) && !NS_OTHER.test(t.replace(/\b(nov[oa]s?|outr[oa]s?) /g, ''));
+  }
+  const NS_NUM = {um:1,uma:1,dois:2,duas:2,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10};
+  function newSlideFlow(t, raw) {
+    const m = raw.match(/(?:sobre|chamad[oa]|com (?:o )?t[ií]tulo|t[ií]tulo)\s*:?\s*["“]?(.+?)["”]?$/i);
+    const kind = /texto livre|so (de )?texto|de texto\b/.test(t) ? 'text' : /(figura \+ texto|tela dividida|dividid)/.test(t) ? 'split' : /(so (de )?(as )?figura|so (de )?imagem|de figuras?\b)/.test(t) ? 'image'
+      : /so o incorreto/.test(t) ? 'only-incorrect' : /so o correto/.test(t) ? 'only-correct' : /(correto x incorreto|comparac|comparativ)/.test(t) ? 'compare' : null;
+    const title = m ? m[1].replace(/\s+(em|no|na|com|de)\s+(texto livre|figura \+ texto|figura e texto|tela dividida|so figuras?|so o correto|so o incorreto|correto x incorreto).*$/i, '') : '';
+    const nm = t.match(new RegExp('\\b(\\d{1,2}|' + Object.keys(NS_NUM).join('|') + ')\\s+(nov[oa]s?\\s+)?' + NS_NOUN));
+    let count = nm ? (/\d/.test(nm[1]) ? parseInt(nm[1], 10) : NS_NUM[nm[1]]) : 1;
+    count = Math.max(1, Math.min(20, count || 1));
+    const plural = count === 1 && /\b(slides|paginas|laminas|novos|novas)\b/.test(t);
+    if (typeof window.seseOpenNewPage !== 'function') return '<p>Use o botão <b>+ Nova</b> em “Suas páginas”.</p>' + acts([whereBtn({sel:'#newPageBtn', tip:'+ Nova'})]);
+    let made = 0;
+    const open = () => window.seseOpenNewPage({title: made === 0 ? title : '', kind, onDone: at => {
+      made++;
+      const left = count - made;
+      say(`<p>➕ Criei o ${slideRef(at)} como <b>${esc(kindLabel(kindOf(app().pages[at])))}</b>.${left > 0 ? ` ${left === 1 ? 'Falta' : 'Faltam'} <b>${left}</b>: abri a janela de novo.` : ''}</p>` +
+        acts(nextSteps(at).concat(left > 0 ? [] : [act('➕ Criar outro slide', () => { count = made + 1; open(); return ''; })])));
+      if (left > 0) setTimeout(open, 450);
+    }});
+    open();
+    const head = count > 1 ? `<p>Vamos criar <b>${count} slides</b>, um de cada vez: a janela <b>Nova página</b> reabre sozinha até completar.</p>`
+      : `<p>Abri a janela <b>Nova página</b>${title ? ' com o título “' + esc(String(title).toUpperCase()) + '”' : ''}.${plural ? ' Depois de criar, use <b>➕ Criar outro slide</b> para continuar.' : ''}</p>`;
+    return head + `<ol><li><b>Tipo de layout</b>${kind ? ' (já marquei “' + esc(kindLabel(kind)) + '”)' : ''}</li><li><b>Cores</b></li><li><b>Fonte e título</b></li><li><b>Posição</b> na lista</li></ol><p>A página nasce limpa, sem fotos nem vídeo.</p>`;
+  }
+  const KB_STRONG = 7, KB_OK = 4.5, UI_OK = 3;
+  const locate = t => /\b(onde|me (mostr\w*|lev\w*|indiqu\w*|aponte)|mostr\w* onde|leva\w* (ate|para|pra)|localiz\w*|encontr\w*|achar|nao (acho|encontro))\b/.test(t);
   function answer(raw) {
     const t0 = norm(raw);
     if (!t0) return '<p>Escreva sua dúvida ou o que deseja que eu faça.</p>';
     if (!ready()) return '<p>Aguarde o projeto terminar de carregar e tente de novo.</p>';
-    if (/\b(comandos|sinonimos|que palavras|palavras que (voce|vc) entende|o que (voce|vc) entende|lista de comandos)\b/.test(t0)) return commandsHtml();
-    lastRaw = t0;
-    const {t, notes} = canonical(t0);
-    const note = noteHtml(notes);
-    const withNote = out => out ? out + note : out;
-    const k1 = kbSearch(t0), k2 = kbSearch(t);
-    const kb = k2.bestScore > k1.bestScore ? k2 : k1;
-    // Pergunta ("como…?", "onde…?") nunca executa ação: responde explicando.
-    if (question(t)) {
-      const cmd = commandIn(t);
-      const byCmd = {excluir:'Criar, duplicar e excluir slides', criar:'Criar, duplicar e excluir slides', duplicar:'Criar, duplicar e excluir slides', ocultar:'Ocultar slides', exibir:'Ocultar slides', mudar:'Tipos de página', gerar:'Como gerar o MP4?', colocar:'Inserir fotos e figuras', organizar:'Boas práticas', pausar:'Pausar em um slide'};
-      if (kb.best && kb.bestScore >= 3) return withNote(kbAnswer(kb.best) + related(kb.others));
-      const objs = objectsIn(t);
-      if (cmd === 'excluir' && objs.includes('foto')) return withNote(kbAnswer(kbBy('Remover uma foto')));
-      if (cmd === 'excluir' && objs.includes('marcacao')) return withNote(kbAnswer(kbBy('Apagar marcações que vieram na foto')));
-      if ((cmd === 'excluir' || cmd === 'colocar') && (objs.includes('etiqueta') || objs.includes('texto') || objs.includes('elemento'))) return withNote(kbAnswer(kbBy('Mexer em figuras e textos livres')));
-      if (cmd === 'mudar' && objs.includes('cores')) return withNote(kbAnswer(kbBy('Cores do layout')));
-      if (cmd === 'mudar' && objs.includes('fonte')) return withNote(kbAnswer(kbBy('Fontes')));
-      if (cmd && kbBy(byCmd[cmd])) return withNote(kbAnswer(kbBy(byCmd[cmd])) + '<p style="opacity:.8">Se quiser que eu faça, diga por exemplo: “' + esc({excluir:'excluir slide 3', criar:'novo slide', duplicar:'duplicar slide 2', ocultar:'ocultar slide 3', exibir:'exibir slide 3', mudar:'mudar para figura + texto', gerar:'gere o mp4', colocar:'inserir foto no lado correto', organizar:'organize o texto', pausar:'pausar no slide 1'}[cmd]) + '”.</p>');
-      if (kb.best) return withNote(kbAnswer(kb.best) + related(kb.others));
+    const fix = correct(t0);
+    const t = rewrite(fix.text);
+    const note = fix.changed ? `<p class="b-fix">Entendi: “${esc(fix.text)}”</p>` : '';
+    const isQ = question(t, raw);
+    const kb = kbSearch(t);
+    // 1) “Onde fica…”, “me mostra…”: leva direto ao ponto.
+    if (locate(t)) {
+      const uiExact = uiSearch(t).find(r => r.hits >= queryStems(t).filter(s => !['ond','esta','fic','encontr','ach','mostr','lev','localiz'].includes(s)).length && r.score >= 4 && !containerOf(r.it.el) && visible(r.it.el));
+      if (uiExact) { const shown = showWhere({el: uiExact.it.el, tip: uiExact.it.label}); return note + shown + (kb.best && kb.bestScore >= KB_OK ? kbAnswer(kb.best) : uiAnswer([uiExact])); }
+      if (kb.best && kb.bestScore >= KB_OK && kb.best.w && kb.best.w.kind && kindOf(app().pages[currentPage]) !== kb.best.w.kind) return note + kbAnswer(kb.best) + related(kb.others);
+      if (kb.best && kb.bestScore >= KB_OK && kb.best.w) { const shown = showWhere(kb.best.w); return note + shown + kbAnswer(kb.best) + related(kb.others); }
+      const ui = uiSearch(t);
+      if (ui.length && ui[0].score >= UI_OK) return note + showWhere({el: ui[0].it.el, tip: ui[0].it.label}) + uiAnswer(ui);
+      if (kb.best && kb.bestScore >= KB_OK) return note + kbAnswer(kb.best, {auto:true}) + related(kb.others);
     }
-    if (!question(t)) { const c = clarify(t, raw); if (c !== null) return withNote(c); }
+    // 1b) Pedido de slide/página nova (qualquer forma: adicionar, inserir, incluir, novos slides…).
+    if (!isQ && wantsNewSlide(t)) return note + newSlideFlow(t, raw);
+    // 2) Dúvidas e problemas vão para a base de conhecimento (e nunca executam ações destrutivas).
+    if (isQ) {
+      if (kb.best && kb.bestScore >= KB_OK) return note + kbAnswer(kb.best, {auto: kb.bestScore >= KB_STRONG}) + related(kb.others);
+      const ui = uiSearch(t);
+      if (ui.length && ui[0].score >= UI_OK) return note + uiAnswer(ui, {auto:true});
+    }
+    if (/\b(cor|cores|paleta)\b/.test(t) && /(personaliz|propria|minha cor|da empresa|qualquer cor)/.test(t)) return note + kbAnswer(kbBy('Cores personalizadas'), {auto:true});
+    // 3) Pedidos de ação.
     for (const intent of INTENTS) {
+      if (isQ && !intent.info) continue;
       let ok = false; try { ok = intent.test(t); } catch (e) { ok = false; }
-      if (ok) { const out = intent.run(t, raw); return out === undefined ? '' : withNote(out); }
+      if (ok) { const out = intent.run(t, raw); return out === undefined || out === '' ? (note || '') : note + out; }
     }
-    if (kb.best) return withNote(kbAnswer(kb.best) + related(kb.others));
-    return withNote(notUnderstood(t));
+    // 4) Sem comando reconhecido: melhor resposta possível.
+    if (kb.best && kb.bestScore >= 3) return note + kbAnswer(kb.best, {auto: kb.bestScore >= KB_STRONG}) + related(kb.others);
+    const ui = uiSearch(t);
+    if (ui.length && ui[0].score >= 2) return note + uiAnswer(ui);
+    return note + fallbackHtml(t, kb);
   }
-  function notUnderstood(t) {
-    const cmd = commandIn(t), objs = objectsIn(t).filter(o => o !== 'slide' || /slide/.test(t));
-    const objWords = {slide:'o slide', foto:'as fotos', texto:'o texto', etiqueta:'a etiqueta', elemento:'o elemento', cores:'as cores', fonte:'a fonte', titulo:'o título', video:'o MP4', musica:'a música', layout:'o tipo de layout', intervalo:'o intervalo', apresentacao:'a apresentação', marcacao:'as marcações'};
-    const verbs = {excluir:'excluir', duplicar:'duplicar', ocultar:'ocultar', exibir:'exibir', mudar:'mudar', gerar:'gerar', colocar:'inserir', organizar:'organizar', criar:'criar', pausar:'pausar'};
-    if (cmd) {
-      const options = ['slide', 'foto', 'texto', 'etiqueta', 'cores', 'fonte'].map(o => act(`${verbs[cmd]} ${objWords[o]}`, () => answer(`${cmd === 'colocar' ? 'coloque' : cmd} ${o}`)));
-      return `<p>Entendi que você quer <b>${verbs[cmd]}</b>, mas não identifiquei o quê. Você quis dizer:</p>` + acts(options);
-    }
-    if (objs.length) {
-      const o = objs[0];
-      const pairs = {slide:['ir para','duplicar','ocultar','excluir'], foto:['inserir','excluir'], texto:['inserir','organizar','excluir'], etiqueta:['inserir','excluir'], cores:['mudar'], fonte:['mudar'], video:['gerar'], musica:['tocar','parar'], layout:['mudar'], intervalo:['mudar'], titulo:['mudar'], elemento:['excluir'], apresentacao:['iniciar'], marcacao:['explicar']};
-      const say2 = {'ir para':'va para', duplicar:'duplique', ocultar:'ocultar', excluir:'excluir', inserir:'coloque', organizar:'organize', mudar:'mude', gerar:'gere', tocar:'toque', parar:'pare', iniciar:'inicie', explicar:'como marcar'};
-      return `<p>Entendi que é sobre <b>${esc(objWords[o] || o)}</b>. O que você quer fazer?</p>` + acts((pairs[o] || ['explicar']).map(v => act(`${v} ${objWords[o] || o}`, () => answer(`${say2[v]} ${o === 'slide' ? 'slide ' + (currentPage + 1) : o}`))).concat([act('❓ Explicar', () => { const r = kbSearch(o); return r.best ? kbAnswer(r.best) : helpHtml(); })]));
-    }
-    return `<p>Não entendi bem. 🤔 Tente com outras palavras ou escolha um destes:</p>` + acts([
-      act('🔎 Analisar meus slides', analysisHtml, 'pri'), act('🎬 Como gerar o MP4?', () => kbAnswer(KB[0])),
-      act('🖼️ Inserir figura', () => answer('inserir figura')), act('⭐ Boas práticas', () => kbAnswer(KB[KB.length - 1])),
-      act('📖 Comandos e sinônimos', commandsHtml)]);
-  }
-  function related(list) { return list.length ? '<p style="margin-top:8px;opacity:.8">Relacionado:</p>' + acts(list.map(e => act(esc(e.q), () => kbAnswer(e)))) : ''; }
   function helpHtml() {
     return `<p><b>Posso tirar dúvidas e fazer por você:</b></p><ul>
       <li>🔎 <b>Analisar</b> os slides com boas práticas e corrigir (“analise meus slides”)</li>
@@ -11101,8 +11251,9 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
       <li>📄 Páginas: criar, duplicar, excluir, ocultar, ir para (“novo slide sobre uso de capacete”, “ocultar slide 3”)</li>
       <li>🔁 Tipo e cores (“mudar para figura + texto”, “cores segurança em todos”)</li>
       <li>🧹 Organizar (“organize o texto em tópicos”, “padronizar títulos”, “intervalo 15”)</li>
-      <li>▶ Apresentar, pausar em um slide e tocar música</li></ul>
-      <p>Também explico qualquer função e entendo sinônimos (“elimine”, “remova”, “apague” = <b>excluir</b>). Peça “comandos” para ver a lista completa.</p>` + acts([act('📖 Comandos e sinônimos', commandsHtml)]);
+      <li>▶ Apresentar, pausar em um slide e tocar música</li>
+      <li>📍 <b>Mostrar onde fica</b> qualquer botão ou opção (“onde fica o volume da música?”)</li></ul>
+      <p>Também explico qualquer função: marcações, lupa, enquadramento, fontes, quiosque, sincronização… Entendo sinônimos e erros de digitação.</p>`;
   }
   function welcome(again) {
     const P = app().pages;
@@ -11112,7 +11263,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
   }
 
   /* ---------------- Interface ---------------- */
-  const CHIPS = ['Analisar meus slides', 'Gerar MP4', 'Inserir figura', 'Novo slide', 'Comandos', 'Boas práticas', 'Resumo do projeto', 'Organizar texto'];
+  const CHIPS = ['Analisar meus slides', 'Gerar MP4', 'Onde fica o volume da música?', 'Inserir figura', 'Novo slide', 'Boas práticas', 'Resumo do projeto', 'Organizar texto', 'Como marcar a foto?'];
   byId('brainChips').innerHTML = CHIPS.map(c => `<button type="button">${esc(c)}</button>`).join('');
   byId('brainChips').addEventListener('click', e => { const b = e.target.closest('button'); if (b) send(b.textContent); });
   let greeted = false;
@@ -11140,7 +11291,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
   // Atalho: Ctrl+/ abre o assistente.
   document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === '/' && !document.body.classList.contains('tv-mode')) { e.preventDefault(); panel.hidden ? panelOpen() : panelClose(); } });
 
-  window.seseBrain = { ask: text => answer(text), send, analyze, open: panelOpen, close: panelClose };
+  window.seseBrain = { ask: text => answer(text), send, analyze, open: panelOpen, close: panelClose, showWhere, search: t => kbSearch(norm(t)) };
 })();
 
 </script>
