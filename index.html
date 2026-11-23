@@ -1701,6 +1701,9 @@ License: bitstream-vera
     .page-kind{font-size:12px;opacity:.85}
     .page-order-controls{gap:3px;margin-left:4px}
     .page-item .page-order-btn{width:24px;height:26px;font-size:13px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center}
+    .page-item .page-order-btn.page-del.confirming{width:auto;padding:0 8px;font-size:11px;font-weight:800;white-space:nowrap;background:#dc2626!important;border-color:#fca5a5!important;box-shadow:0 0 0 2px rgba(252,165,165,.45)}
+    .page-item .page-order-btn.page-del.blocked{animation:pageDelShake .3s 2}
+    @keyframes pageDelShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
     .page-item{padding:10px 8px}
     .page-item .page-drag-handle{margin-right:6px}
     button:disabled{opacity:.45;cursor:not-allowed}
@@ -1761,6 +1764,15 @@ License: bitstream-vera
       </div>
 
       <p class="mobile-editor-heading" id="mobileEditingPage"></p>
+      <div class="group" id="mobile-panel-project">
+        <h2>Projeto</h2>
+        <p class="hint">Pronto para TV 4K · Para maior nitidez, use as fotos originais em alta resolução. Fotos importadas na versão antiga precisam ser reinseridas para recuperar a qualidade.</p>
+        <div class="btns">
+          <button class="primary" id="saveProjectBtn">Salvar backup</button>
+          <button class="secondary" id="loadProjectBtn">Carregar backup</button><button class="secondary" onclick="downloadHTML()">Baixar HTML atualizado</button>
+        </div>
+      </div>
+
       <button type="button" class="primary" id="lastSlideShortcut" style="width:100%;margin-bottom:14px">Última página ↓</button>
       <div class="group" id="pagesListGroup" data-mobile-panel="text">
         <h2>Slides realizados <span id="slidesTotal"></span></h2>
@@ -1954,14 +1966,6 @@ License: bitstream-vera
         <p class="hint" id="musicStatus"></p>
       </div>
 
-      <div class="group" id="mobile-panel-project">
-        <h2>Projeto</h2>
-        <p class="hint">Pronto para TV 4K · Para maior nitidez, use as fotos originais em alta resolução. Fotos importadas na versão antiga precisam ser reinseridas para recuperar a qualidade.</p>
-        <div class="btns">
-          <button class="primary" id="saveProjectBtn">Salvar backup</button>
-          <button class="secondary" id="loadProjectBtn">Carregar backup</button><button class="secondary" onclick="downloadHTML()">Baixar HTML atualizado</button>
-        </div>
-      </div>
       <div class="group" id="mobile-panel-text">
         <h2>Estrutura da página</h2>
         <label for="pageNumber">Número (automático)</label>
@@ -3832,13 +3836,37 @@ License: bitstream-vera
         });
 
         const delBtn = btn.querySelector(".page-del");
+        // Confirmação dentro da própria página (confirm() nativo é bloqueado em iframes/apps incorporados).
+        const resetDelBtn = () => {
+          clearTimeout(delBtn._confirmTimer);
+          delBtn.classList.remove("confirming");
+          delBtn.textContent = "🗑";
+          delBtn.title = "Excluir esta página";
+          delBtn.setAttribute("aria-label", "Excluir página " + (index + 1));
+        };
         const deleteThisPage = e => {
           e.stopPropagation(); e.preventDefault();
-          if (pages.length <= 1) { alert("É necessário manter pelo menos uma página."); return; }
-          if (!confirm("Excluir a Página " + (index + 1) + " (" + (page.title || "sem título") + ")? Esta ação não pode ser desfeita facilmente.")) return;
+          if (pages.length <= 1) {
+            delBtn.title = "É necessário manter pelo menos uma página.";
+            delBtn.classList.add("blocked");
+            setTimeout(() => delBtn.classList.remove("blocked"), 600);
+            return;
+          }
+          if (!delBtn.classList.contains("confirming")) {
+            list.querySelectorAll(".page-del.confirming").forEach(other => { if (other !== delBtn) other._reset && other._reset(); });
+            delBtn.classList.add("confirming");
+            delBtn.textContent = "Excluir?";
+            delBtn.title = "Clique de novo para excluir a Página " + (index + 1) + " (" + (page.title || "sem título") + ")";
+            delBtn.setAttribute("aria-label", delBtn.title);
+            delBtn._confirmTimer = setTimeout(resetDelBtn, 4000);
+            return;
+          }
+          resetDelBtn();
+          const at = pages.indexOf(page);
+          if (at < 0) { renderPagesList(); return; }
           const change = projectHistoryBegin('excluir página');
-          pages.splice(index, 1);
-          if (index < currentPage) currentPage -= 1;
+          pages.splice(at, 1);
+          if (at < currentPage) currentPage -= 1;
           currentPage = Math.max(0, Math.min(currentPage, pages.length - 1));
           pages.forEach((item, i) => { item.number = String(i + 1); });
           projectHistoryCommit(change);
@@ -3847,6 +3875,7 @@ License: bitstream-vera
           autoSaveProject();
           if (typeof scheduleCloudSave === "function") scheduleCloudSave();
         };
+        delBtn._reset = resetDelBtn;
         delBtn.addEventListener("click", deleteThisPage);
         delBtn.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") deleteThisPage(e); });
 
@@ -4633,6 +4662,7 @@ License: bitstream-vera
       data.textContent = JSON.stringify({...projectSnapshot(),exportId:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)}).replace(/</g,'\\u003c');
       root.querySelector('head').appendChild(data);
       root.querySelectorAll('dialog[open]').forEach(dialog => dialog.removeAttribute('open'));
+      root.querySelectorAll('#brainFab,#brainPanel,#seseBrainStyles').forEach(el => el.remove());
       ['#floatLayer', '#themeFeatured', '#themeGrid', '#emojiTabs', '#emojiGrid', '#labelGrid'].forEach(selector => { const el = root.querySelector(selector); if (el) el.innerHTML = ''; });
       const blob = new Blob(['<!DOCTYPE html>\n'+root.outerHTML], {type:"text/html;charset=utf-8"});
       const url = URL.createObjectURL(blob);
@@ -9752,7 +9782,7 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
       row.innerHTML = '<button class="primary" id="tvUsbVideoBtn" style="grid-column:1/-1" title="Um único MP4 com a abertura e todas as páginas, para USB > Vídeos na TV">Apresentação completa em MP4</button>' +
         '<button class="secondary" id="tvUsbPhotosBtn" title="Gera fotos JPG para abrir em USB > Fotos na TV">Fotos para TV</button>' +
         '<button class="secondary" id="pptExportBtn" title="Gera um arquivo PowerPoint com todas as páginas e o vídeo de abertura">PowerPoint (com vídeo)</button>';
-      group.after(row);
+      group.before(row);
       const hint = document.createElement('p');
       hint.className = 'hint';
       hint.textContent = 'TV sem navegador não abre HTML. Use "Apresentação completa em MP4" (abertura + todas as páginas num só vídeo) e copie para o pen drive. A gravação leva o tempo da apresentação. Use o relógio de intervalo para escolher quantos segundos cada página fica na tela.';
@@ -9887,6 +9917,630 @@ if (typeof module === "object" && typeof module.exports === "object") Object.ass
     joined = { rate, buf }; return buf;
   }
   window.seseMusic = { wantsExport: () => !!state.exp, getBuffer, volume: () => level() };
+})();
+
+</script>
+<script id="seseBrainScript">
+/* ================================================================
+   CÉREBRO SESE — assistente offline do SESE Studio
+   - Tira dúvidas sobre todas as funções (base de conhecimento local)
+   - Analisa os slides com boas práticas e sugere correções
+   - Executa ações: gerar MP4, inserir figuras, criar/ir/ocultar slides,
+     mudar tipo e cores, organizar textos, apresentar, música…
+   Funciona sem internet e sem serviços externos.
+   ================================================================ */
+(() => {
+  'use strict';
+  if (window.seseBrain) return;
+  const byId = id => document.getElementById(id);
+  const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[×x]\s*(?=incorreto)/g, ' x ').replace(/[^a-z0-9#%:+\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  const esc = v => String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const has = (t, ...words) => words.some(w => t.includes(w));
+  const app = () => ({
+    pages: typeof pages !== 'undefined' ? pages : [],
+    cur: typeof currentPage !== 'undefined' ? currentPage : 0
+  });
+  const ready = () => !document.querySelector('.app')?.inert;
+  const save = () => {
+    try { if (typeof autoSaveProject === 'function') autoSaveProject(); } catch (e) { console.warn(e); }
+  };
+  const hidden = p => typeof isPageHidden === 'function' ? isPageHidden(p) : p?.hidden === true;
+  const kindOf = p => { try { return pageKind(p); } catch (e) { return 'compare'; } };
+  const kindLabel = k => (typeof PAGE_KINDS !== 'undefined' && PAGE_KINDS[k]) ? PAGE_KINDS[k].label : k;
+  const imgs = (p, side) => { try { return sideImages(p, side) || []; } catch (e) { return []; } };
+  const elems = p => { try { return pageElements(p); } catch (e) { return []; } };
+  const titleOf = (p, i) => (String(p?.title || '').trim() || 'sem título');
+  const slideRef = i => `Slide ${i + 1} — “${esc(titleOf(app().pages[i]))}”`;
+  const interval = () => Math.max(5, parseInt(byId('autoTvInterval')?.value, 10) || 10);
+
+  /* ---------------- Estilos ---------------- */
+  const css = `
+  #brainFab{position:fixed;right:18px;bottom:18px;z-index:9000;width:62px;height:62px;border-radius:50%;border:0;cursor:pointer;
+    background:radial-gradient(circle at 30% 25%,#ff8bd1,#c026d3 45%,#6d28d9);color:#fff;display:grid;place-items:center;
+    box-shadow:0 10px 28px rgba(109,40,217,.45),0 0 0 4px rgba(255,255,255,.85);transition:transform .15s}
+  #brainFab:hover{transform:scale(1.07)}
+  #brainFab:focus-visible{outline:3px solid #f4bf12;outline-offset:3px}
+  #brainFab svg{width:36px;height:36px}
+  #brainFab::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(192,38,211,.55);animation:brainPulse 2.4s ease-out infinite}
+  #brainFab .brain-dot{position:absolute;top:3px;right:3px;width:14px;height:14px;border-radius:50%;background:#f4bf12;border:2px solid #fff}
+  #brainFab .brain-dot[hidden]{display:none}
+  @keyframes brainPulse{0%{transform:scale(.92);opacity:.9}100%{transform:scale(1.25);opacity:0}}
+  #brainPanel{position:fixed;right:18px;bottom:92px;z-index:9001;width:min(420px,calc(100vw - 24px));height:min(640px,calc(100dvh - 120px));
+    display:flex;flex-direction:column;background:#0f1b2d;color:#eaf1fa;border-radius:20px;overflow:hidden;
+    box-shadow:0 24px 70px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.12);font-family:Montserrat,Poppins,Arial,sans-serif}
+  #brainPanel[hidden]{display:none}
+  #brainPanel .bh{display:flex;align-items:center;gap:10px;padding:12px 14px;background:linear-gradient(135deg,#6d28d9,#c026d3)}
+  #brainPanel .bh svg{width:30px;height:30px;flex:none}
+  #brainPanel .bh strong{display:block;font-size:15px}
+  #brainPanel .bh small{display:block;font-size:11px;opacity:.85}
+  #brainPanel .bh button{margin-left:auto;background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:10px;width:34px;height:34px;font-size:20px;cursor:pointer}
+  #brainPanel button{min-height:0;height:auto;width:auto;min-width:0;box-shadow:none;transform:none;line-height:1.25;margin:0;letter-spacing:0;text-transform:none}
+  #brainPanel .bh button{width:34px;height:34px;padding:0}
+  #brainLog{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}
+  .bm{max-width:92%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.5;word-wrap:break-word}
+  .bm.bot{background:#1b2a42;align-self:flex-start;border-top-left-radius:4px}
+  .bm.me{background:#1465ea;align-self:flex-end;border-top-right-radius:4px;white-space:pre-wrap}
+  .bm p{margin:0 0 6px}.bm p:last-child{margin-bottom:0}
+  .bm ul,.bm ol{margin:4px 0 6px;padding-left:18px}.bm li{margin:2px 0}
+  .bm h4{margin:8px 0 4px;font-size:13px;color:#f5c2ff}
+  .bm code{background:rgba(255,255,255,.1);padding:1px 5px;border-radius:5px;font-size:12px}
+  .bm .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .bm .acts button,.brain-chips button{background:#2b405c;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 11px;font:600 12px Montserrat,Arial,sans-serif;cursor:pointer}
+  .bm .acts button.pri{background:#c026d3;border-color:#e879f9}
+  .bm .acts button.dan{background:#b91c1c;border-color:#fca5a5}
+  .bm .acts button:hover,.brain-chips button:hover{filter:brightness(1.15)}
+  .bm .acts button:disabled{opacity:.45;cursor:default}
+  .b-score{display:flex;align-items:center;gap:10px;margin:2px 0 8px}
+  .b-score b{font-size:26px}
+  .b-bar{flex:1;height:8px;border-radius:9px;background:#2b405c;overflow:hidden}.b-bar i{display:block;height:100%;border-radius:9px}
+  .b-item{display:flex;gap:6px;align-items:flex-start;margin:4px 0}
+  .b-item .tag{flex:none;font-size:10px;font-weight:800;border-radius:6px;padding:2px 5px;margin-top:2px}
+  .tag.erro{background:#b91c1c}.tag.atencao{background:#d97706}.tag.dica{background:#2563eb}.tag.ok{background:#15803d}
+  .b-item > div{flex:1;min-width:0}
+  .b-item .acts{margin-top:4px;gap:5px}
+  .b-item .acts button{padding:3px 9px;font-size:11px;border-radius:7px}
+  .brain-chips{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;border-top:1px solid rgba(255,255,255,.08);scrollbar-width:thin}
+  .brain-chips button{white-space:nowrap;flex:none}
+  #brainForm{display:flex;gap:8px;padding:10px 12px 12px;border-top:1px solid rgba(255,255,255,.08);background:#0b1524}
+  #brainInput{flex:1;resize:none;min-height:42px;height:42px;margin:0;width:auto;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:#14223a;color:#fff;padding:10px;font:500 13px Montserrat,Arial,sans-serif;max-height:110px}
+  #brainForm button{min-height:42px!important;background:#c026d3;color:#fff;border:0;border-radius:12px;padding:0 14px;font:800 13px Montserrat,Arial,sans-serif;cursor:pointer}
+  .b-typing span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:#f5c2ff;animation:bType 1s infinite}
+  .b-typing span:nth-child(2){animation-delay:.15s}.b-typing span:nth-child(3){animation-delay:.3s}
+  @keyframes bType{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  body.tv-mode #brainFab,body.tv-mode #brainPanel,html.kiosk #brainFab,html.kiosk #brainPanel{display:none!important}
+  @media print{#brainFab,#brainPanel{display:none!important}}
+  @media (max-width:900px){#brainFab{bottom:150px;right:10px;width:54px;height:54px}#brainPanel{right:10px;left:10px;width:auto;top:10px;bottom:214px;height:auto}}
+  @media (prefers-reduced-motion:reduce){#brainFab::after,.b-typing span{animation:none}}`;
+  const style = document.createElement('style');
+  style.id = 'seseBrainStyles'; style.textContent = css;
+  document.head.appendChild(style);
+
+  const BRAIN_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+    <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+    <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/>
+    <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/>
+    <path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>`;
+
+  /* ---------------- Estrutura ---------------- */
+  const fab = document.createElement('button');
+  fab.type = 'button'; fab.id = 'brainFab';
+  fab.title = 'Cérebro SESE — assistente: tire dúvidas, analise os slides e peça ações';
+  fab.setAttribute('aria-label', fab.title); fab.setAttribute('aria-expanded', 'false'); fab.setAttribute('aria-controls', 'brainPanel');
+  fab.innerHTML = BRAIN_SVG + '<span class="brain-dot" aria-hidden="true"></span>';
+  const panel = document.createElement('section');
+  panel.id = 'brainPanel'; panel.hidden = true;
+  panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', 'Cérebro SESE, assistente do editor');
+  panel.innerHTML = `
+    <div class="bh">${BRAIN_SVG}<div><strong>Cérebro SESE</strong><small>Assistente offline · dúvidas, análise e ações</small></div>
+      <button type="button" id="brainClose" aria-label="Fechar assistente" title="Fechar (Esc)">×</button></div>
+    <div id="brainLog" aria-live="polite"></div>
+    <div class="brain-chips" id="brainChips" role="group" aria-label="Sugestões rápidas"></div>
+    <form id="brainForm" autocomplete="off">
+      <textarea id="brainInput" rows="1" placeholder="Pergunte ou peça… ex.: analise meus slides" aria-label="Mensagem para o assistente"></textarea>
+      <button type="submit">Enviar</button>
+    </form>`;
+  document.body.appendChild(fab); document.body.appendChild(panel);
+  const log = byId('brainLog'), input = byId('brainInput');
+
+  /* ---------------- Mensagens e ações ---------------- */
+  const actions = new Map(); let actSeq = 0;
+  const act = (label, fn, cls = '') => { const k = 'a' + (++actSeq); actions.set(k, fn); return `<button type="button" class="${cls}" data-act="${k}">${label}</button>`; };
+  const acts = list => list.filter(Boolean).length ? `<div class="acts">${list.filter(Boolean).join('')}</div>` : '';
+  function scrollDown() { log.scrollTop = log.scrollHeight; }
+  function say(html) { const div = document.createElement('div'); div.className = 'bm bot'; div.innerHTML = html; log.appendChild(div); scrollDown(); return div; }
+  function me(text) { const div = document.createElement('div'); div.className = 'bm me'; div.textContent = text; log.appendChild(div); scrollDown(); }
+  log.addEventListener('click', event => {
+    const button = event.target.closest('button[data-act]'); if (!button) return;
+    const fn = actions.get(button.dataset.act); if (!fn) return;
+    if (button.dataset.once === '1') button.disabled = true;
+    try { const out = fn(button); if (out) say(out); }
+    catch (error) { console.error(error); say('<p>⚠️ Não consegui fazer isso agora: ' + esc(error.message || error) + '</p>'); }
+  });
+
+  /* ---------------- Ações sobre o projeto ---------------- */
+  function goTo(i, quiet) {
+    const P = app().pages; if (!P[i]) return '<p>Esse slide não existe.</p>';
+    currentPage = i; syncFormFromPage(); save();
+    const item = document.querySelector(`#pagesList [data-index="${i}"]`);
+    if (item) item.scrollIntoView({block:'nearest', behavior:'smooth'});
+    if (typeof selectMobileTab === 'function' && matchMedia('(max-width: 900px)').matches) { try { selectMobileTab('view'); } catch (e) {} }
+    return quiet ? '' : `<p>Pronto, abri o ${slideRef(i)}.</p>`;
+  }
+  function commit(label, fn) {
+    const change = projectHistoryBegin(label);
+    fn();
+    projectHistoryCommit(change);
+    syncFormFromPage(); save();
+  }
+  function deleteAt(i) {
+    const P = app().pages;
+    if (!P[i]) return '<p>Esse slide não existe mais.</p>';
+    if (P.length <= 1) return '<p>É preciso manter pelo menos uma página.</p>';
+    const name = slideRef(i);
+    commit('excluir página', () => {
+      P.splice(i, 1);
+      if (i < currentPage) currentPage -= 1;
+      currentPage = Math.max(0, Math.min(currentPage, P.length - 1));
+    });
+    return `<p>🗑 Excluí o ${name}. Se foi engano, use <b>Desfazer</b>.</p>` + acts([act('↶ Desfazer', () => { byId('projectUndoBtn')?.click(); return '<p>Desfeito.</p>'; })]);
+  }
+  function setHidden(i, wantHidden) {
+    const P = app().pages; if (!P[i]) return '<p>Esse slide não existe.</p>';
+    if (hidden(P[i]) === wantHidden) return `<p>O ${slideRef(i)} já está ${wantHidden ? 'oculto' : 'visível'}.</p>`;
+    if (wantHidden && P.filter(p => !hidden(p)).length <= 1) return '<p>Mantenha pelo menos um slide visível na apresentação.</p>';
+    togglePageHidden(i);
+    return `<p>${wantHidden ? '🙈 Ocultei' : '👁 Voltei a exibir'} o ${slideRef(i)}.</p>`;
+  }
+  function setTitle(i, text) {
+    const P = app().pages; if (!P[i]) return '<p>Esse slide não existe.</p>';
+    const value = String(text).trim().replace(/^["'“”]+|["'“”.]+$/g, '').toUpperCase();
+    if (!value) return '<p>Diga o novo título, por exemplo: <code>título: USO DE LUVAS</code>.</p>';
+    commit('editar título', () => { P[i].title = value; });
+    return `<p>✏️ Título do slide ${i + 1} agora é “${esc(value)}”.</p>` + (value.length > 45 ? `<p>Dica: ele tem ${value.length} caracteres; na TV, títulos até ~40 são lidos mais rápido.</p>` : '');
+  }
+  function newPage(title) {
+    addPage();
+    if (title) setTitle(currentPage, title);
+    return `<p>➕ Criei o ${slideRef(currentPage)} no fim da lista.</p>` + acts([
+      act('📷 Fotos do lado correto', () => pickPhotos('left')),
+      act('📷 Fotos do lado incorreto', () => pickPhotos('right')),
+      act('📝 Mudar para texto livre', () => changeKind('text')),
+      act('🖼️ Mudar para figura + texto', () => changeKind('split'))]);
+  }
+  function changeKind(kind) {
+    if (kind === 'video' && !window.seseIsVideoPage) return '<p>O tipo <b>Vídeo</b> precisa do arquivo <code>video-support.js</code>, que não foi carregado neste aparelho. Abra o editor pelo endereço da hospedagem, onde esse arquivo fica junto do HTML.</p>';
+    const before = kindOf(app().pages[currentPage]);
+    setPageLayout(kind); save();
+    const after = kindOf(app().pages[currentPage]);
+    if (before === after && before !== kind) return '<p>Não consegui mudar o tipo desta página.</p>';
+    const tips = {
+      compare: 'Preencha as duas colunas com 1 a 3 fotos cada, de preferência da mesma cena.',
+      'only-correct': 'Use quando só o jeito certo importa (ex.: procedimento).',
+      'only-incorrect': 'Bom para alertas: mostre o erro e marque o ponto com uma seta ou círculo.',
+      text: 'Escreva no máximo 5 linhas curtas; use <b>+ Novo texto</b> para outras caixas.',
+      split: 'Coloque a figura e até 5 linhas de texto. Posso organizar o texto em tópicos: peça “organize o texto”.',
+      image: 'Até 6 figuras; “Tela cheia” remove a barra de título.',
+      video: 'Escolha o vídeo no bloco que aparece na barra lateral.'
+    };
+    return `<p>🔁 Página ${currentPage + 1} agora é <b>${esc(kindLabel(kind))}</b>.</p><p>${tips[kind] || ''}</p>`;
+  }
+  function pickPhotos(side) {
+    const P = app().pages, p = P[currentPage], k = kindOf(p);
+    if (side === 'right' && k !== 'compare' && k !== 'only-incorrect') return '<p>Esta página não tem lado “incorreto”. Mude para <b>Correto × Incorreto</b> primeiro.</p>' + acts([act('Mudar para Correto × Incorreto', () => changeKind('compare'))]);
+    byId(side === 'right' ? 'rightInlineUpload' : 'leftInlineUpload')?.click();
+    const where = (k === 'compare' || k === 'only-correct' || k === 'only-incorrect') ? (side === 'right' ? 'do lado incorreto' : 'do lado correto') : 'da página';
+    return `<p>📂 Abri a escolha de fotos ${where} (até 6). Depois use ✋ para enquadrar e ✎ para marcar o ponto importante.</p>`;
+  }
+  function pickFloatFigure() {
+    byId('floatImageInput')?.click();
+    return '<p>📂 Escolha a figura (pode ser mais de uma). Ela aparece no slide; arraste para posicionar, use a bolinha ↘ para o tamanho e ⟳ para girar.</p>';
+  }
+  function addLabel(preset) {
+    addTextElement({text:preset.text, bg:preset.bg, color:preset.color, bgOp:100, w:34, fs:3.4});
+    return `<p>🏷️ Coloquei a etiqueta <b>${esc(preset.text)}</b> no slide ${currentPage + 1}. Arraste para o lugar certo.</p>`;
+  }
+  function addFreeText(text) {
+    if (kindOf(app().pages[currentPage]) === 'text' && typeof addPageTextBox === 'function' && !text) { addPageTextBox(); return '<p>🔤 Criei uma nova caixa de texto. Já pode digitar.</p>'; }
+    addTextElement(text ? {text} : undefined);
+    return `<p>🔤 Adicionei uma caixa de texto${text ? ' com “' + esc(text) + '”' : ''}. Dê dois cliques nela para editar.</p>`;
+  }
+  function organizeText(i) {
+    const P = app().pages, p = P[i]; const k = kindOf(p);
+    const bulletize = raw => {
+      let parts = String(raw || '').replace(/\r/g, '').split(/\n+/);
+      if (parts.length <= 1) parts = String(raw || '').split(/(?<=[.;!?])\s+|\s+-\s+/);
+      return parts.map(s => s.trim().replace(/^[-–•*·]\s*/, '').replace(/[.;]+$/, '')).filter(Boolean)
+        .map(s => /^\p{Extended_Pictographic}/u.test(s) ? s : '• ' + s.charAt(0).toUpperCase() + s.slice(1));
+    };
+    if (k === 'split') {
+      const lines = bulletize(p.freeText);
+      if (!lines.length) return '<p>Esta página ainda não tem texto ao lado da figura.</p>';
+      currentPage = i;
+      if (typeof setPageFreeText === 'function') setPageFreeText(lines.join('\n'), 'brain'); else commit('organizar texto', () => { p.freeText = lines.join('\n'); });
+      syncFormFromPage(); save();
+      return `<p>🧹 Organizei o texto do slide ${i + 1} em ${lines.length} tópico(s).</p>` + (lines.length > 5 ? '<p>São mais de 5 tópicos: na TV, o ideal é até 5. Considere dividir em dois slides.</p>' : '');
+    }
+    if (k === 'text') {
+      const list = elems(p); const box = list.filter(el => el.type === 'text').sort((a, b) => String(b.text || '').length - String(a.text || '').length)[0];
+      if (!box) return '<p>Esta página não tem caixa de texto.</p>';
+      const lines = bulletize(box.text);
+      currentPage = i; syncFormFromPage();
+      floatMutate('organizar texto', l => { const el = l.find(e => e.id === box.id); if (el) el.text = lines.join('\n'); });
+      return `<p>🧹 Organizei a maior caixa de texto do slide ${i + 1} em ${lines.length} tópico(s).</p>`;
+    }
+    return '<p>Organizo textos de páginas <b>Texto livre</b> e <b>Figura + texto</b>. Esta página é “' + esc(kindLabel(k)) + '”.</p>';
+  }
+  function themeList() { return typeof SLIDE_THEMES !== 'undefined' ? SLIDE_THEMES : []; }
+  function applyTheme(id, all) {
+    const t = themeList().find(x => x.id === id);
+    setPageTheme(id, !!all); save();
+    if (typeof scheduleCloudSave === 'function') { try { scheduleCloudSave(); } catch (e) {} }
+    return `<p>🎨 Apliquei as cores <b>${esc(t ? t.name : id)}</b> ${all ? 'em todas as ' + app().pages.length + ' páginas' : 'na página ' + (currentPage + 1)}.</p>`;
+  }
+  function moveHiddenToEnd() {
+    const P = app().pages; const sel = P[currentPage];
+    const vis = P.filter(p => !hidden(p)), hid = P.filter(p => hidden(p));
+    if (!hid.length) return '<p>Não há slides ocultos.</p>';
+    commit('organizar slides ocultos no final', () => { P.splice(0, P.length, ...vis, ...hid); currentPage = Math.max(0, P.indexOf(sel)); });
+    return `<p>📦 Movi ${hid.length} slide(s) oculto(s) para o fim da lista. A ordem da apresentação não muda.</p>`;
+  }
+  function upperTitles() {
+    const P = app().pages; let n = 0;
+    commit('padronizar títulos', () => P.forEach(p => { const up = String(p.title || '').toUpperCase(); if (up !== p.title) { p.title = up; n++; } }));
+    return `<p>🔠 Padronizei ${n} título(s) em letras maiúsculas.</p>`;
+  }
+  function setIntervalSeconds(s) {
+    const sel = byId('autoTvInterval'); if (!sel) return '<p>Não encontrei o controle de intervalo.</p>';
+    s = Math.max(5, Math.min(600, Math.round(s)));
+    if (![...sel.options].some(o => o.value === String(s))) sel.add(new Option(s + ' s', String(s)));
+    sel.value = String(s); sel.dispatchEvent(new Event('change', {bubbles:true}));
+    const vis = app().pages.filter(p => !hidden(p)).length;
+    return `<p>⏱ Intervalo agora é <b>${s} s</b> por slide. Um ciclo com ${vis} slides leva cerca de ${fmtTime(vis * s)} (sem contar a abertura).</p>`;
+  }
+  const fmtTime = sec => sec >= 60 ? `${Math.floor(sec / 60)} min${sec % 60 ? ' ' + (sec % 60) + ' s' : ''}` : sec + ' s';
+  function openExport(id, what) {
+    const button = byId(id);
+    if (!button) return `<p>Não encontrei o botão de ${what}.</p>`;
+    button.click();
+    return '';
+  }
+
+  /* ---------------- Análise com boas práticas ---------------- */
+  function analyze() {
+    const P = app().pages, items = [];
+    const add = (level, i, text, fixes) => items.push({level, i, text, fixes: fixes || []});
+    const visibleIdx = P.map((p, i) => i).filter(i => !hidden(P[i]));
+    const labelTexts = (typeof LABEL_PRESETS !== 'undefined' ? LABEL_PRESETS : []).map(l => l.text);
+    P.forEach((p, i) => {
+      if (hidden(p)) return;
+      const k = kindOf(p), title = String(p.title || '').trim();
+      const L = imgs(p, 'left').length, R = imgs(p, 'right').length, els = elems(p);
+      if (!title || /^nova pagina$/i.test(norm(title))) add('erro', i, 'Sem título definido.');
+      else if (title.length > 45) add('atencao', i, `Título longo (${title.length} caracteres). Na TV, o ideal é até ~40.`);
+      if (k === 'compare') {
+        if (!L) add('erro', i, 'Lado CORRETO sem foto.', [['📷 Pôr fotos', () => { goTo(i, true); return pickPhotos('left'); }]]);
+        if (!R) add('erro', i, 'Lado INCORRETO sem foto.', [['📷 Pôr fotos', () => { goTo(i, true); return pickPhotos('right'); }]]);
+        if (L > 3 || R > 3) add('dica', i, `Muitas fotos (${L} × ${R}). Com mais de 3 por lado, ficam pequenas na TV.`);
+      } else if (k === 'only-correct' || k === 'only-incorrect' || k === 'image') {
+        if (!L && !R) add('erro', i, 'Página sem foto/figura.', [['📷 Pôr fotos', () => { goTo(i, true); return pickPhotos('left'); }]]);
+      } else if (k === 'split') {
+        if (!L && !R) add('erro', i, 'Falta a figura da tela dividida.', [['📷 Pôr figura', () => { goTo(i, true); return pickPhotos('left'); }]]);
+        const ft = String(p.freeText || '').trim();
+        if (!ft || /^explique aqui/i.test(ft)) add('erro', i, 'Texto ao lado da figura não foi escrito.');
+        else {
+          const lines = ft.split(/\n+/).filter(Boolean).length;
+          if (ft.length > 300 || lines > 6) add('atencao', i, `Texto extenso (${ft.length} caracteres, ${lines} linha(s)). Na TV, use até 5 tópicos curtos.`, [['🧹 Organizar em tópicos', () => organizeText(i)]]);
+          else if (lines === 1 && ft.length > 120) add('dica', i, 'Texto em bloco único. Tópicos são lidos mais rápido.', [['🧹 Organizar em tópicos', () => organizeText(i)]]);
+        }
+      } else if (k === 'text') {
+        const texts = els.filter(e => e.type === 'text'), total = texts.reduce((s, e) => s + String(e.text || '').length, 0);
+        if (!texts.length) add('erro', i, 'Página de texto sem nenhum texto.');
+        else if (texts.some(e => /^escreva aqui o texto/i.test(String(e.text || '')))) add('erro', i, 'Ainda está com o texto de exemplo.');
+        else if (total > 380) add('atencao', i, `Muito texto (${total} caracteres). Prefira até 5 linhas curtas.`, [['🧹 Organizar em tópicos', () => organizeText(i)]]);
+      } else if (k === 'video' && !window.seseIsVideoPage) add('atencao', i, 'Página de vídeo, mas o suporte de vídeo não carregou neste aparelho.');
+      const labels = els.filter(e => e.type === 'text' && labelTexts.includes(e.text)).length;
+      if (els.length > 8) add('dica', i, `${els.length} elementos livres no slide. Excesso polui a mensagem.`);
+      else if (labels > 2) add('dica', i, `${labels} etiquetas no mesmo slide. Use no máximo 1 ou 2.`);
+      if (k === 'compare' || k === 'only-correct' || k === 'only-incorrect') {
+        const marks = ['left', 'right'].reduce((s, side) => s + (Array.isArray(p[side + 'Annotations']) ? p[side + 'Annotations'].reduce((a, x) => a + ((x && x.objects) || []).length, 0) : 0), 0);
+        if ((L || R) && !marks && k !== 'compare') add('dica', i, 'Sem marcação nas fotos. Uma seta ou círculo guia o olhar para o ponto da regra.');
+      }
+    });
+    // Visão do conjunto
+    const seen = new Map();
+    visibleIdx.forEach(i => { const key = norm(P[i].title); if (!key || key === 'nova pagina') return; seen.set(key, [...(seen.get(key) || []), i]); });
+    seen.forEach(list => { if (list.length > 1) add('atencao', list[1], `Título repetido em ${list.map(i => 'slide ' + (i + 1)).join(', ')}.`); });
+    const nVis = visibleIdx.length;
+    if (nVis > 15) add('dica', null, `${nVis} slides visíveis: um ciclo leva ~${fmtTime(nVis * interval())}. O ideal são 8 a 15 slides (2 a 3 min).`);
+    if (nVis && nVis < 3) add('dica', null, `Só ${nVis} slide(s) visível(is). A TV vai repetir muito rápido.`);
+    const themes = new Map(); visibleIdx.forEach(i => { const t = P[i].theme || 'sese'; themes.set(t, (themes.get(t) || 0) + 1); });
+    if (themes.size > 1) {
+      const top = [...themes.entries()].sort((a, b) => b[1] - a[1])[0][0];
+      const name = (themeList().find(t => t.id === top) || {name: top.startsWith('custom') ? 'personalizada' : top}).name;
+      add('dica', null, `${themes.size} paletas de cores diferentes nos slides visíveis. Uma paleta só dá identidade ao conjunto.`, [[`🎨 Usar “${name}” em todos`, () => applyTheme(top, true)]]);
+    }
+    const lower = visibleIdx.filter(i => /[a-zà-ú]/.test(String(P[i].title || ''))).length;
+    if (lower) add('dica', null, `${lower} título(s) com letras minúsculas; o padrão SESÉ usa títulos em maiúsculas.`, [['🔠 Padronizar títulos', upperTitles]]);
+    const textual = visibleIdx.filter(i => ['text', 'split'].includes(kindOf(P[i]))).length;
+    if (textual && interval() < 10) add('dica', null, `Intervalo de ${interval()} s com ${textual} slide(s) de texto. Para leitura, use 15 s.`, [['⏱ Usar 15 s', () => setIntervalSeconds(15)]]);
+    const nHid = P.length - nVis;
+    const hiddenMixed = P.some((p, i) => hidden(p) && P.slice(i + 1).some(q => !hidden(q)));
+    if (nHid && hiddenMixed) add('dica', null, `${nHid} slide(s) oculto(s) misturados na lista.`, [['📦 Mover ocultos para o final', moveHiddenToEnd]]);
+    const pen = {erro: 8, atencao: 4, dica: 1};
+    const score = Math.max(0, 100 - items.reduce((s, it) => s + pen[it.level], 0));
+    return {items, score, nVis, nHid, total: P.length};
+  }
+  function analysisHtml() {
+    const r = analyze();
+    const label = r.score >= 90 ? 'Excelente' : r.score >= 75 ? 'Bom' : r.score >= 50 ? 'Regular' : 'Precisa de atenção';
+    const color = r.score >= 90 ? '#22c55e' : r.score >= 75 ? '#84cc16' : r.score >= 50 ? '#f59e0b' : '#ef4444';
+    const count = lv => r.items.filter(it => it.level === lv).length;
+    let html = `<p><b>Análise dos slides</b> · ${r.nVis} visíveis de ${r.total}${r.nHid ? ` (${r.nHid} oculto(s))` : ''}</p>
+      <div class="b-score"><b style="color:${color}">${r.score}</b><div class="b-bar"><i style="width:${r.score}%;background:${color}"></i></div><span>${label}</span></div>
+      <p>${count('erro')} erro(s) · ${count('atencao')} atenção · ${count('dica')} dica(s)</p>`;
+    if (!r.items.length) return html + '<p class="b-item"><span class="tag ok">OK</span> Tudo dentro das boas práticas. Pode gerar o MP4!</p>' + acts([act('🎬 Gerar MP4', () => openExport('tvUsbVideoBtn', 'MP4'), 'pri')]);
+    const order = {erro: 0, atencao: 1, dica: 2};
+    const sorted = r.items.slice().sort((a, b) => order[a.level] - order[b.level] || (a.i ?? 999) - (b.i ?? 999));
+    const tagName = {erro: 'ERRO', atencao: 'ATENÇÃO', dica: 'DICA'};
+    const row = it => {
+      const where = it.i === null ? '<b>Conjunto:</b> ' : `<b>Slide ${it.i + 1}:</b> `;
+      const buttons = (it.i !== null ? [act('Ir', () => goTo(it.i))] : []).concat(it.fixes.map(([l, f]) => act(l, f)));
+      return `<div class="b-item"><span class="tag ${it.level}">${tagName[it.level]}</span><div>${where}${esc(it.text)}${buttons.length ? acts(buttons) : ''}</div></div>`;
+    };
+    const first = sorted.slice(0, 12), rest = sorted.slice(12);
+    html += first.map(row).join('');
+    if (rest.length) html += acts([act(`Ver mais ${rest.length}`, b => { b.disabled = true; return rest.map(row).join(''); })]);
+    html += '<p style="margin-top:8px">Corrija primeiro os <b>erros</b>: eles aparecem para todos na TV.</p>';
+    return html;
+  }
+
+  /* ---------------- Resumo do projeto ---------------- */
+  function summaryHtml() {
+    const P = app().pages, vis = P.filter(p => !hidden(p));
+    const byKind = {}; vis.forEach(p => { const k = kindLabel(kindOf(p)); byKind[k] = (byKind[k] || 0) + 1; });
+    const photos = P.reduce((s, p) => s + imgs(p, 'left').length + imgs(p, 'right').length, 0);
+    return `<p><b>Resumo do projeto</b></p><ul>
+      <li>${P.length} slide(s) no total, ${vis.length} visível(is) e ${P.length - vis.length} oculto(s)</li>
+      <li>${Object.entries(byKind).map(([k, n]) => `${n} ${esc(k)}`).join(' · ') || 'nenhum visível'}</li>
+      <li>${photos} foto(s) nos quadros</li>
+      <li>Intervalo: ${interval()} s · ciclo de ~${fmtTime(vis.length * interval())} + abertura</li>
+      <li>Você está no ${slideRef(currentPage)}</li></ul>` + acts([act('🔎 Analisar qualidade', analysisHtml, 'pri')]);
+  }
+
+  /* ---------------- Base de conhecimento ---------------- */
+  const KB = [
+    {k:['mp4','video para tv','video completo','exportar video','gerar video','pen drive video','4k','full hd'], q:'Como gerar o MP4?', a:() => `<p>No topo do menu, bloco <b>Projeto</b>, clique em <b>Apresentação completa em MP4</b>. Escolha <b>Full HD</b> (padrão) ou <b>4K</b> e deixe marcado “Incluir o vídeo de abertura”. Depois clique em <b>Gerar MP4</b>.</p>
+      <ul><li>Sai um arquivo <code>REGRAS_SESE_COMPLETO.mp4</code>: abertura com som, depois os slides visíveis, ${interval()} s cada.</li><li>Use Chrome ou Edge atualizados; em outros navegadores pode sair WEBM, que muitas TVs não abrem.</li><li>Deixe a aba aberta até terminar e copie o arquivo para o pen drive.</li></ul>`, x:() => [act('🎬 Abrir gerador de MP4', () => preMp4(), 'pri'), act('🔎 Conferir slides antes', analysisHtml)]},
+    {k:['inserir figura','inserir foto','inserir imagem','adicionar foto','adicionar figura','adicionar imagem','colocar foto','colocar figura','colocar imagem','anexar','incluir figura','incluir foto','por foto','subir foto','carregar foto'], q:'Inserir fotos e figuras', a:'<p>Há dois jeitos:</p><ul><li><b>Fotos da regra</b>: clique no quadro do lado (correto, incorreto ou da figura) e escolha até 6 fotos. Depois use ✋ para enquadrar e ✎ para marcar.</li><li><b>Figura livre</b> (logo, ícone, placa): bloco “Figuras, textos e emojis livres” › <b>🖼️ + Figura</b>; ela pode ir para qualquer lugar do slide.</li></ul>', x:() => [act('📷 Fotos do lado correto', () => pickPhotos('left'), 'pri'), act('📷 Fotos do lado incorreto', () => pickPhotos('right')), act('🧩 Figura livre', pickFloatFigure)]},
+    {k:['nova pagina','novo slide','criar slide','criar pagina','duplicar','excluir slide','apagar slide','excluir pagina','lixeira'], q:'Criar, duplicar e excluir slides', a:'<p>Em <b>Suas páginas</b>: <b>+ Nova</b> cria uma página no fim (no mesmo tipo e cores da atual), <b>Duplicar</b> copia a atual. Para excluir, clique na 🗑 do slide na lista e depois em <b>Excluir?</b> para confirmar. Posso fazer: “novo slide sobre uso de capacete”, “excluir slide 4”.</p>', x:() => [act('➕ Criar slide agora', () => newPage(''), 'pri')]},
+    {k:['powerpoint','pptx','ppt'], q:'Como exportar para PowerPoint?', a:'<p>Bloco <b>Projeto</b> → <b>PowerPoint (com vídeo)</b>. Cada página vira um slide editável, que troca sozinho e se repete. O vídeo de abertura entra no 1º slide e toca automaticamente.</p>', x:() => [act('📊 Gerar PowerPoint', () => openExport('pptExportBtn', 'PowerPoint'), 'pri')]},
+    {k:['fotos para tv','jpg','zip','usb fotos','fotos da tv','tv sem navegador'], q:'Fotos para TV', a:'<p><b>Fotos para TV</b> gera um ZIP com um JPG por slide e um LEIA-ME. Extraia, copie a pasta <code>REGRAS_SESE</code> para o pen drive (FAT32 ou exFAT) e, na TV, abra USB › Fotos › REGRAS_SESE com repetição ligada.</p>', x:() => [act('🖼️ Gerar fotos', () => openExport('tvUsbPhotosBtn', 'fotos'), 'pri')]},
+    {k:['pdf','imprimir','impressao'], q:'Exportar PDF', a:'<p>O ícone de documento na barra superior abre a impressão do navegador com o <b>slide atual</b>. Escolha “Salvar como PDF” como destino.</p>', x:() => [act('🖨 Abrir impressão', () => { byId('printBtn')?.click(); return ''; })]},
+    {k:['backup','copia de seguranca','salvar backup','carregar backup','restaurar'], q:'Backup', a:'<p><b>Salvar backup</b> guarda uma cópia neste navegador. <b>Carregar backup</b> traz essa cópia de volta e <b>substitui o projeto compartilhado</b> para todos. Faça backup antes de mudanças grandes.</p>', x:() => [act('💾 Salvar backup agora', () => { byId('saveProjectBtn')?.click(); return '<p>Pedi o backup. Uma mensagem vai confirmar.</p>'; })]},
+    {k:['baixar html','html atualizado','offline','sem internet','arquivo html'], q:'Baixar HTML / usar sem internet', a:'<p><b>Baixar HTML atualizado</b> salva uma cópia do editor com o projeto dentro. Ela abre sem internet em “Modo local” e salva só no aparelho, sem sincronizar com os outros. Precisa de conexão no momento de baixar para incluir o suporte a vídeo.</p>'},
+    {k:['sincroniz','nuvem','firebase','outro computador','outros aparelhos','compartilhad','tempo real','salva sozinho','salvo'], q:'Como funciona o salvamento?', a:'<p>Tudo salva sozinho: primeiro no aparelho, depois na nuvem, e os outros aparelhos recebem na hora. A barra azul no topo mostra o estado (“Salvo e sincronizado ✓”). Sem internet, as mudanças ficam guardadas e sobem quando a conexão voltar; mantenha a aba aberta.</p>'},
+    {k:['desfazer','refazer','ctrl z','voltar atras','errei'], q:'Desfazer', a:'<p>Use <b>Desfazer</b> e <b>Refazer</b> no topo (Ctrl+Z / Ctrl+Y). Valem até 40 alterações nesta sessão. Recarregar a página ou receber mudanças de outro aparelho zera o histórico.</p>', x:() => [act('↶ Desfazer agora', () => { byId('projectUndoBtn')?.click(); return '<p>Feito.</p>'; })]},
+    {k:['marcac','marcar','ponto na foto','ponto importante','seta','circulo','retangulo','destacar','apontar','desenhar','lupa','ampliar detalhe'], q:'Marcar pontos na foto', a:'<p>Passe o mouse na foto e clique em <b>✎</b>. No editor de marcações há seta, linha, retângulo, círculo, <b>lupa</b> (amplia um detalhe), texto, selos ✅/❌ e figura sobreposta. Escolha cor e espessura, desenhe e clique em aplicar. As marcações continuam editáveis.</p><p>Boa prática: <b>uma</b> seta ou círculo vermelho no ponto da regra.</p>'},
+    {k:['apagar antigas','marcacao antiga','marcacoes antigas','apagar marcac','remover marcac','tirar marcac','marcas antigas','remover marca','tirar rabisco','cobrir'], q:'Apagar marcações que vieram na foto', a:'<p>No editor de marcações (✎), use <b>▧ Apagar antigas</b>. Escolha “Copiar área limpa da foto”, clique em <b>1. Escolher área limpa</b>, depois pinte por cima da marcação antiga.</p>'},
+    {k:['enquadr','posicionar foto','zoom na foto','cortar foto','mover foto','cortada'], q:'Enquadrar a foto', a:'<p>Na foto, clique em <b>✋</b> para abrir “Posicionar foto”: arraste e use + Zoom / − Zoom. O arquivo original não muda, só o enquadramento.</p>'},
+    {k:['encaixe','fundo estendido','foto vertical','desfocado','preencher','inteira','estender'], q:'Encaixe das fotos', a:'<p>Em <b>Tipo de página</b> há 4 encaixes: <b>Inteira</b> (sem cortar), <b>Estender</b> (vira paisagem sem deformar), <b>Fundo estendido</b> (inteira com fundo desfocado, ótimo para fotos verticais) e <b>Preencher</b> (corta as bordas).</p>'},
+    {k:['remover foto','excluir foto','apagar foto','tirar foto'], q:'Remover uma foto', a:'<p>Passe o mouse na foto e clique no <b>×</b>. Para tirar todas as fotos da página, use <b>Limpar imagens</b> em “Suas páginas”.</p>'},
+    {k:['tipo de pagina','tipos de pagina','layout','modelo de pagina'], q:'Tipos de página', a:'<p>São 7: <b>Correto × Incorreto</b> (padrão), <b>Só o correto</b>, <b>Só o incorreto</b>, <b>Texto livre</b>, <b>Figura + texto</b> (tela dividida), <b>Só figuras</b> e <b>Vídeo</b>. Posso mudar para você: diga, por exemplo, “mudar para figura + texto”.</p>'},
+    {k:['etiqueta','selo','faixa','aviso pronto'], q:'Etiquetas prontas', a:'<p>No bloco <b>Figuras, textos e emojis livres</b> há 12 etiquetas: ATENÇÃO, CORRETO, INCORRETO, PARE, PROIBIDO, PERIGO, USE EPI, DICA, IMPORTANTE, FIQUE ATENTO, BLOQUEIE e EMERGÊNCIA. Use no máximo 1 ou 2 por slide.</p>', x:() => labelButtons()},
+    {k:['emoji'], q:'Emojis', a:'<p>No bloco <b>Figuras, textos e emojis livres</b>, escolha a categoria e clique no emoji. “Colocar na tela” cria um emoji arrastável; “Inserir no texto” coloca dentro do texto que estiver sendo editado.</p>'},
+    {k:['elemento','arrastar','girar','opacidade','para frente','para tras','redimension'], q:'Mexer em figuras e textos livres', a:'<p>Clique no elemento para selecionar. Arraste para mover, a bolinha <b>↘</b> muda o tamanho e a <b>⟳</b> gira. O painel “Ajustar elemento selecionado” tem cor, fundo, fonte, opacidade, frente/trás, duplicar, centralizar e excluir. No teclado: setas movem, Delete apaga, Esc solta.</p>'},
+    {k:['cor','cores','paleta','tema'], q:'Cores do layout', a:() => `<p>Em <b>Cores e fontes do layout</b> há ${themeList().length} paletas e uma personalizada (🎨). “Aplicar estas cores a todas as páginas” padroniza o conjunto. Posso aplicar: diga “cores segurança em todos”.</p>`, x:() => themeButtons()},
+    {k:['fonte','letra','google fonts','tipografia'], q:'Fontes', a:'<p>Em <b>Cores e fontes do layout</b>, escolha a fonte da página, busque qualquer fonte do Google Fonts ou envie um arquivo (.ttf, .otf, .woff). As fontes ficam guardadas no projeto e funcionam sem internet. “Fonte em todas” aplica no conjunto.</p>'},
+    {k:['ocultar','esconder','nao aparecer','exibir na apresentacao','marcar exibir'], q:'Ocultar slides', a:'<p>Desmarque <b>Exibir</b> na lista (ou use “Ocultar este slide”). O slide fica guardado, mas não aparece na TV nem nas exportações e não recebe número. Posso fazer: “ocultar slide 3”.</p>'},
+    {k:['reordenar','mudar ordem','ordem dos slides','arrastar slide','mover slide'], q:'Mudar a ordem', a:'<p>Na lista “Slides realizados”, use as setas <b>↑ ↓</b> ou arraste pela alça <b>⋮⋮</b>. A numeração acompanha a posição.</p>'},
+    {k:['numero','numeracao','contagem'], q:'Numeração', a:'<p>O número é automático e segue a posição entre os slides visíveis. Para tirar de uma página, desmarque “Mostrar número nesta página”; a contagem pula essa página.</p>'},
+    {k:['apresentar','apresentacao','tela cheia','modo tv','tv automatica','passar slides','teclado'], q:'Apresentar na TV', a:'<p><b>Apresentação</b> abre em tela cheia; avance com → ou espaço, volte com ←, Esc sai. O botão ▶ (TV automática) toca a abertura e troca os slides sozinho no intervalo escolhido, em ciclo.</p>', x:() => [act('▶ TV automática', () => { panelClose(); byId('autoTvBtn')?.click(); return ''; }, 'pri'), act('🖥 Apresentação manual', () => { panelClose(); byId('tvModeBtn')?.click(); return ''; })]},
+    {k:['quiosque','#tv','tv sozinha','ligando sozinha','liga sozinha','sozinha','sem ninguem','iniciar sozinh','abrir direto','abrir sozinho','ligar a tv','sem clique','automatico ao abrir'], q:'Modo quiosque', a:'<p>Abra o endereço do editor terminando em <code>#tv</code> (ex.: <code>…/index.html#tv&amp;tempo=15&amp;som=0</code>). A TV começa sozinha, em ciclo, pula vídeo travado, volta à apresentação após 2 min sem uso e recarrega 1 vez por dia de madrugada.</p>'},
+    {k:['pausar','fixo','parar no slide','congelar'], q:'Pausar em um slide', a:'<p>Clique em <b>⏸ Pausar</b> no slide da lista: a apresentação abre parada nele até você tirar a pausa. Posso fazer: “pausar no slide 2”.</p>'},
+    {k:['abertura','video de abertura','intro'], q:'Vídeo de abertura', a:'<p>A abertura (<code>abertura-sese.mp4</code>) toca antes dos slides na TV automática e entra no MP4 e no PowerPoint. Ela fica num arquivo ao lado do HTML na hospedagem; sem ele, a apresentação pula direto para os slides.</p>'},
+    {k:['musica','som','audio','volume'], q:'Música de fundo', a:'<p>No bloco 🎵 há 4 músicas em sequência. Ajuste o volume, escolha se toca na TV e se entra no MP4. Elas não tocam durante a abertura.</p>', x:() => [act('▶ Ouvir / parar', () => { byId('musicPreviewBtn')?.click(); return ''; }), act('⏭ Próxima', () => { byId('musicNextBtn')?.click(); return ''; })]},
+    {k:['intervalo','tempo de troca','quantos segundos','tempo por slide','velocidade'], q:'Intervalo entre slides', a:() => `<p>O relógio na barra superior define o tempo de cada slide (agora: <b>${interval()} s</b>). Boa prática: 10 s para fotos e 15 a 20 s para textos. Diga “intervalo 15” e eu ajusto.</p>`},
+    {k:['visualizar','previa','como vai ficar','preview'], q:'Visualizar a apresentação', a:'<p>A aba <b>👁 Visualizar apresentação</b>, à direita do slide, mostra o slide atual e o próximo exatamente como saem na TV e no MP4.</p>'},
+    {k:['celular','mobile','telefone','smartphone'], q:'Usar no celular', a:'<p>No celular, use as abas Apresentação, Textos e Projeto. Deslize o slide para trocar de página. Ao apresentar, escolha horizontal ou orientação atual.</p>'},
+    {k:['tela escura','modo escuro','dark'], q:'Tela escura', a:'<p>O ícone de lua na barra superior alterna a tela escura do editor (não muda os slides).</p>'},
+    {k:['figura + texto','tela dividida','texto ao lado','marcador','topicos'], q:'Figura + texto', a:'<p>Coloque a figura de um lado (35% a 65%) e o texto do outro. Use os botões • Marcador, ✅ Item e ⚠️ Item, alinhamento, tamanho e 4 estilos de caixa. Posso organizar o texto em tópicos: “organize o texto”.</p>'},
+    {k:['seguranca do projeto','senha','login','apagar tudo','qualquer pessoa'], q:'Segurança do projeto compartilhado', a:'<p>O projeto na nuvem não exige login: quem tiver o HTML consegue alterar ou apagar os slides. Guarde o arquivo só com a equipe e faça backups. O ideal é configurar regras de acesso no Firebase.</p>'},
+    {k:['quantas fotos','quantas imagens','numero de fotos','quantidade de fotos','quantos slides','quantas paginas','tamanho do titulo','titulo ideal','titulo grande','quanto texto','quantas linhas','muito texto'], q:'Quantidades ideais', a:'<p><b>Referências para TV:</b></p><ul><li><b>Fotos:</b> 1 a 3 por lado (até 6 cabem, mas ficam pequenas).</li><li><b>Título:</b> até ~40 caracteres, em maiúsculas.</li><li><b>Texto:</b> até 5 linhas curtas.</li><li><b>Etiquetas:</b> no máximo 1 ou 2 por slide.</li><li><b>Slides por ciclo:</b> 8 a 15 (2 a 3 minutos).</li><li><b>Intervalo:</b> 10 s com fotos, 15 a 20 s com texto.</li></ul>', x:() => [act('🔎 Conferir meus slides', analysisHtml, 'pri')]},
+    {k:['boas praticas','melhor pratica','dicas','como fazer um bom slide','padrao ideal','recomendac'], q:'Boas práticas', a:'<p><b>Boas práticas para TV</b></p><ul><li>Uma regra por slide; título até ~40 caracteres, em maiúsculas.</li><li>Correto × Incorreto: 1 a 3 fotos por lado, mesma cena, mudando só o comportamento.</li><li>Uma seta ou círculo no ponto da regra; lupa para detalhes pequenos.</li><li>Texto: até 5 linhas curtas, com ✅ e ⚠️.</li><li>No máximo 1 ou 2 etiquetas por slide.</li><li>Uma paleta de cores para todo o conjunto.</li><li>8 a 15 slides por ciclo; 10 s com fotos, 15 s com texto.</li><li>Fotos originais, nítidas e na horizontal.</li><li>Oculte (não apague) slides desatualizados.</li><li>Antes de exportar, confira em “Visualizar apresentação”.</li></ul>', x:() => [act('🔎 Analisar meus slides', analysisHtml, 'pri')]}
+  ];
+  const kbBy = q => KB.find(e => e.q === q);
+  function labelButtons() { return (typeof LABEL_PRESETS !== 'undefined' ? LABEL_PRESETS : []).map(p => act(esc(p.text), () => addLabel(p))); }
+  function themeButtons(all) {
+    return themeList().map(t => act(esc(t.name), () => applyTheme(t.id, all)));
+  }
+  function preMp4() {
+    const r = analyze(), errs = r.items.filter(it => it.level === 'erro');
+    if (errs.length) return `<p>⚠️ Antes do MP4: encontrei <b>${errs.length} erro(s)</b> que vão aparecer no vídeo (ex.: ${esc(errs[0].i !== null ? 'slide ' + (errs[0].i + 1) + ': ' : '')}${esc(errs[0].text)}).</p>` +
+      acts([act('🔎 Ver os problemas', analysisHtml), act('🎬 Gerar assim mesmo', () => openExport('tvUsbVideoBtn', 'MP4'), 'pri')]);
+    openExport('tvUsbVideoBtn', 'MP4');
+    return `<p>🎬 Abri o gerador: ${r.nVis} slides visíveis, ${interval()} s cada. Escolha Full HD ou 4K e clique em <b>Gerar MP4</b>.</p>`;
+  }
+
+  /* ---------------- Entendimento das mensagens ---------------- */
+  const NUMS = {um:1,uma:1,primeiro:1,primeira:1,dois:2,duas:2,segundo:2,segunda:2,tres:3,terceiro:3,terceira:3,quatro:4,quarto:4,quarta:4,cinco:5,quinto:5,quinta:5,seis:6,sexto:6,sete:7,setimo:7,oito:8,oitavo:8,nove:9,nono:9,dez:10,decimo:10};
+  function slideIndex(t) {
+    const m = t.match(/(?:slide|pagina|pag|tela)s?\s*(?:n|numero|no)?\s*(\d{1,3})\b/) || t.match(/\b(\d{1,3})\s*(?:o|a)?\s*(?:slide|pagina)\b/);
+    if (m) return parseInt(m[1], 10) - 1;
+    const w = t.match(/(?:slide|pagina)\s+(um|uma|dois|duas|tres|quatro|cinco|seis|sete|oito|nove|dez)\b/) || t.match(/\b(primeir[oa]|segund[oa]|terceir[oa]|quart[oa]|quint[oa]|sexto|setimo|oitavo|nono|decimo)\s+(?:slide|pagina)/);
+    if (w) return NUMS[w[1]] - 1;
+    if (/(?:ultim[oa])\s+(?:slide|pagina)|(?:slide|pagina)\s+ultim/.test(t)) return app().pages.length - 1;
+    if (/(este|esse|desse|deste|atual|nesta|nessa|aqui)/.test(t)) return currentPage;
+    return null;
+  }
+  const explicitIndex = t => /(slide|pagina|pag|tela)s?\s*(n|numero|no)?\s*\d|\d\s*(o|a)?\s*(slide|pagina)|(slide|pagina)\s+(um|uma|dois|duas|tres|quatro|cinco|seis|sete|oito|nove|dez)\b|(primeir|segund|terceir|quart|quint|sexto|setimo|oitavo|nono|decimo|ultim)\w*\s+(slide|pagina)/.test(t) ? slideIndex(t) : null;
+  const imperative = t => /\b(gere|gera|gerar|exporte|exporta|exportar|faca|faz|fazer|crie|cria|criar|abra|abre|abrir|inicie|inicia|iniciar|coloque|coloca|colocar|insira|insere|inserir|adicione|adiciona|adicionar|incluir|inclua|inclui|bota|bote|botar|poe|ponha|por|mude|muda|mudar|troque|troca|trocar|aplique|aplica|aplicar|oculte|oculta|ocultar|esconda|esconde|esconder|exclua|exclui|excluir|apague|apaga|apagar|deletar|delete|remova|remover|va|vai|ir|mostre|mostra|duplique|duplica|duplicar|pause|pausa|pausar|toque|toca|tocar|organize|organiza|organizar|formate|formata|formatar|padronize|padroniza|padronizar|renomeie|renomear|analise|analisa|analisar|revise|revisa|revisar|verifique|verifica|verificar|quero|preciso|pode|poderia)\b/.test(t);
+  const request = t => /\b(gere|gera|exporte|exporta|faca|faz|crie|cria|abra|abre|inicie|inicia|coloque|coloca|insira|insere|adicione|adiciona|inclua|inclui|bota|bote|poe|ponha|mude|muda|troque|troca|aplique|aplica|oculte|oculta|esconda|esconde|exclua|exclui|apague|apaga|delete|remova|va|vai|mostre|mostra|duplique|duplica|pause|pausa|toque|toca|organize|organiza|formate|formata|padronize|padroniza|renomeie|analise|analisa|revise|revisa|verifique|verifica|quero|preciso|pode|poderia|por favor|favor)\b/.test(t);
+  const question = t => asksHow(t) && !request(t);
+  const asksHow = t => /\b(como|onde|qual|quais|quant[oa]s?|devo|ideal|vale a pena|e melhor|o que e|oque|pra que|para que|por que|porque|explica|explique|duvida|serve|funciona)\b/.test(t);
+
+  const INTENTS = [
+    {test:t => /^(oi|ola|bom dia|boa tarde|boa noite|e ai|hey|opa)\b/.test(t) && t.length < 25, run:() => welcome(true)},
+    {test:t => /(obrigad|valeu|show|perfeito|otimo|top)\b/.test(t) && t.length < 30, run:() => '<p>Por nada! Se quiser, analiso os slides de novo ou gero o MP4. 🧠</p>'},
+    {test:t => /(o que (voce|vc) (faz|sabe)|ajuda|comandos|como (te )?usar|o que posso pedir|menu)/.test(t) && t.length < 40, run:() => helpHtml()},
+    {test:t => /(analis|revis|verific|avali|diagnost|\bchec|qualidade|\bnota\b|pontua|corrig|problema|\berros?\b)/.test(t) && !/(apagar antigas|marcac)/.test(t) && !/\bmp4\b/.test(t), run:() => analysisHtml()},
+    {test:t => /(resumo|quantos slides|quantas paginas|status do projeto|visao geral)/.test(t), run:() => summaryHtml()},
+    {test:t => /(organiz|formata|topico|marcador|bullet)/.test(t) && /(texto|topico|marcador|bullet|frase|escrito)/.test(t), run:t => { const i = slideIndex(t); return organizeText(i === null ? currentPage : i); }},
+    {test:t => /(organiz|arrum|ordenar|ordem)/.test(t) && /(oculto|escondid)/.test(t), run:() => moveHiddenToEnd()},
+    {test:t => /(padroniz|maiuscul|caixa alta)/.test(t) && /(titul)/.test(t), run:() => upperTitles()},
+    {test:t => /(organiz|arrum|melhor|otimiz)/.test(t) && /(slide|apresenta|projeto|dados|conteudo|pagina)/.test(t), run:() => analysisHtml() },
+    {test:t => /\bmp4\b|video (completo|para tv|da apresentacao)|(gerar|exportar|criar|fazer|gere|faca|crie|exporte) (o |um )?video/.test(t), run:t => question(t) ? kbAnswer(KB[0]) : preMp4()},
+    {test:t => /(powerpoint|pptx|\bppt\b)/.test(t), run:t => question(t) ? kbAnswer(kbBy('Como exportar para PowerPoint?')) : (openExport('pptExportBtn', 'PowerPoint'), '<p>📊 Abri a exportação para PowerPoint.</p>')},
+    {test:t => /(fotos? para (a )?tv|\bzip\b|\bjpg\b)/.test(t), run:t => question(t) ? kbAnswer(kbBy('Fotos para TV')) : (openExport('tvUsbPhotosBtn', 'fotos'), '<p>🖼️ Gerando as fotos para TV…</p>')},
+    {test:t => /\bpdf\b|imprimir/.test(t), run:t => question(t) ? kbAnswer(kbBy('Exportar PDF')) : (byId('printBtn')?.click(), '<p>🖨 Abri a impressão: escolha “Salvar como PDF”.</p>')},
+    {test:t => /(nov[oa]|outr[oa]|mais um[a]?) (slide|pagina)|(cri\w*|adicion\w*|fa(z|ca|zer)|ger\w*) (um |uma |o |a )?(nov[oa] )?(slide|pagina)/.test(t), run:(t, raw) => {
+      const m = raw.match(/(?:sobre|chamad[oa]|com (?:o )?t[ií]tulo|t[ií]tulo)\s*:?\s*["“]?(.+?)["”]?$/i);
+      const out = newPage(m ? m[1] : '');
+      const k = /texto livre/.test(t) ? 'text' : /(figura (\+|e|com) texto|tela dividida|dividid)/.test(t) ? 'split' : /(so (de )?(as )?figura|so (de )?imagem|tela cheia)/.test(t) ? 'image'
+        : /(so o incorreto|so incorreto)/.test(t) ? 'only-incorrect' : /(so o correto|so correto)/.test(t) ? 'only-correct' : null;
+      return k ? out + changeKind(k) : out;
+    }},
+    {test:t => /(etiqueta|selo)/.test(t), run:t => {
+      const presets = typeof LABEL_PRESETS !== 'undefined' ? LABEL_PRESETS : [];
+      const hit = presets.find(p => norm(p.text).split(' ').filter(w => w.length > 2).some(w => new RegExp('\\b' + w).test(t.replace(/\betiqueta\b|\bselo\b/g, ''))));
+      if (hit && imperative(t)) return addLabel(hit);
+      return '<p>Qual etiqueta coloco no slide ' + (currentPage + 1) + '? Use no máximo 1 ou 2 por slide.</p>' + acts(labelButtons());
+    }},
+    {test:t => /(mud|troc|transform|vir|deix|tipo|layout|usar|use|coloc)/.test(t) && /(texto livre|so (as )?figura|so (as )?imagem|tela cheia|figura (\+|e|com) texto|tela dividida|dividid|so o correto|so correto|apenas o correto|so o incorreto|so incorreto|apenas o incorreto|correto x incorreto|comparacao|comparativo|pagina de video|tipo video|para video)/.test(t), run:t => {
+      const k = /texto livre/.test(t) ? 'text' : /(figura (\+|e|com) texto|tela dividida|dividid)/.test(t) ? 'split' : /(so (as )?figura|so (as )?imagem|tela cheia)/.test(t) ? 'image'
+        : /(so o incorreto|so incorreto|apenas o incorreto)/.test(t) ? 'only-incorrect' : /(so o correto|so correto|apenas o correto)/.test(t) ? 'only-correct' : /(video)/.test(t) ? 'video' : 'compare';
+      const i = slideIndex(t); if (i !== null && i !== currentPage) goTo(i, true); return changeKind(k);
+    }},
+    {test:t => /(figura|imagem|imagens|foto|fotos|logo|desenho|icone|ilustracao|print)/.test(t) && imperative(t) && !/(remov|exclu|apag|tirar|tira)/.test(t) && !/(enquadr|posicion|zoom|cort)/.test(t), run:t => {
+      const k = kindOf(app().pages[currentPage]);
+      if (/incorret|errad/.test(t)) return pickPhotos('right');
+      if (/\bcorret|certo/.test(t)) return pickPhotos('left');
+      if (/(livre|qualquer lugar|solta|logo|icone|sobre o slide|em cima)/.test(t)) return pickFloatFigure();
+      const opts = [];
+      if (k === 'compare' || k === 'only-correct') opts.push(act('📷 Fotos do lado correto', () => pickPhotos('left'), 'pri'));
+      if (k === 'compare' || k === 'only-incorrect') opts.push(act('📷 Fotos do lado incorreto', () => pickPhotos('right'), 'pri'));
+      if (k === 'split' || k === 'image') opts.push(act('🖼️ Figura da página', () => pickPhotos('left'), 'pri'));
+      opts.push(act('🧩 Figura livre (qualquer lugar)', pickFloatFigure));
+      return `<p>Onde coloco a figura no slide ${currentPage + 1} (${esc(kindLabel(k))})?</p>` + acts(opts) +
+        '<p>Use <b>fotos do lado</b> para a regra em si e <b>figura livre</b> para logos, ícones e placas.</p>';
+    }},
+    {test:t => /(texto|caixa de texto|frase)/.test(t) && /(adicion|cri|nov|coloc|insir|insere|inserir|bot|ponha|escrev)/.test(t) && !/(titul)/.test(t), run:(t, raw) => {
+      const m = raw.match(/(?:texto|frase)\s*(?:com|dizendo|escrito|:)\s*["“]?(.+?)["”]?$/i); return addFreeText(m ? m[1].trim() : '');
+    }},
+    {test:t => /(titul|renome)/.test(t) && /(para|:|=|seja|chamad)/.test(t) && imperative(t) || /^titulo\s*:/.test(t), run:(t, raw) => {
+      const m = raw.match(/(?:t[ií]tulo|renome\w*)[^:]*?(?:para|:|=|seja|chamad[oa])\s*(.+)$/i); const i = slideIndex(t);
+      return setTitle(i === null ? currentPage : i, m ? m[1] : '');
+    }},
+    {test:t => /(duplic|copia|clon)/.test(t) && /(slide|pagina|este|esse)/.test(t), run:t => { const i = slideIndex(t); if (i !== null) goTo(i, true); duplicatePage(); return `<p>⧉ Dupliquei. Agora você está no ${slideRef(currentPage)}.</p>`; }},
+    {test:t => /(exclu|apag|delet|remov|tira)/.test(t) && /(slide|pagina)/.test(t) && !/(foto|imagem|figura|texto|elemento|marcac)/.test(t), run:t => {
+      const i = slideIndex(t); const idx = i === null ? currentPage : i;
+      if (!app().pages[idx]) return '<p>Não encontrei esse slide.</p>';
+      return `<p>Confirma excluir o ${slideRef(idx)}?</p>` + acts([act('🗑 Sim, excluir', b => { b.parentElement.querySelectorAll('button').forEach(x => x.disabled = true); return deleteAt(idx); }, 'dan'), act('Cancelar', b => { b.parentElement.querySelectorAll('button').forEach(x => x.disabled = true); return '<p>Ok, nada foi excluído.</p>'; })]);
+    }},
+    {test:t => /(ocult|escond|tira(r)? da apresenta|nao exib)/.test(t) && !/desocult/.test(t) && !/(organiz|arrum|ordem)/.test(t), run:t => { const i = slideIndex(t); return setHidden(i === null ? currentPage : i, true); }},
+    {test:t => /(desocult|reexib|volt\w* a (exibir|mostrar)|exib|reativ|mostrar na apresenta)/.test(t) && /(slide|pagina|este|esse)/.test(t), run:t => { const i = slideIndex(t); return setHidden(i === null ? currentPage : i, false); }},
+    {test:t => /(pausa|pausar|fixar|congel)/.test(t) && explicitIndex(t) !== null, run:t => { const i = explicitIndex(t); if (!app().pages[i]) return '<p>Esse slide não existe.</p>'; if (hidden(app().pages[i])) return '<p>Esse slide está oculto; exiba-o antes.</p>'; panelClose(); presentFixedPage(i); return ''; }},
+    {test:t => /(proxim[oa]|seguinte|avanc)/.test(t) && /(slide|pagina)/.test(t), run:() => goTo(Math.min(app().pages.length - 1, currentPage + 1))},
+    {test:t => /(anterior|volta(r)? (um|uma|o slide|a pagina))/.test(t), run:() => goTo(Math.max(0, currentPage - 1))},
+    {test:t => /\b(ir|va|vai|abr\w*|mostr\w*|leva|edit\w*|quero ver|ver)\b/.test(t) && explicitIndex(t) !== null && !/(ocult|exib)/.test(t), run:t => goTo(explicitIndex(t))},
+    {test:t => /\b(cor|cores|paleta|tema)\b/.test(t) && (imperative(t) || /(em todos|em todas|todas as|todos os)/.test(t)), run:t => {
+      const all = /(todos|todas|tudo|conjunto|geral)/.test(t);
+      const hit = themeList().find(th => { const n = norm(th.name).replace(/\(.*?\)/g, ''); return n.split(' ').filter(w => w.length > 3 && !['azul'].includes(w)).some(w => t.includes(w)) || t.includes(th.id); })
+        || (/\bsese\b|padrao/.test(t) ? themeList().find(th => th.id === 'sese') : null);
+      if (hit) return applyTheme(hit.id, all);
+      if (all) { const cur = String(app().pages[currentPage].theme || '') || 'sese'; return applyTheme(cur, true); }
+      return '<p>Qual paleta aplico no slide ' + (currentPage + 1) + '? (Para todas, diga “… em todos”.)</p>' + acts(themeButtons(false));
+    }},
+    {test:t => /(intervalo|tempo de troca|tempo por slide|segundos por|troca a cada|cada slide)/.test(t) && /\d+/.test(t), run:t => setIntervalSeconds(parseInt(t.match(/\d+/)[0], 10))},
+    {test:t => /(tv automatica|modo tv|automatic)/.test(t) && imperative(t) || /^(iniciar|inicia|comecar|comeca) (a )?apresenta/.test(t) || /(apresent(e|a|ar) agora|rodar na tv|passar na tv)/.test(t), run:t => { panelClose(); (/(automatic|tv)/.test(t) ? byId('autoTvBtn') : byId('tvModeBtn'))?.click(); return ''; }},
+    {test:t => /(music|som de fundo)/.test(t) && /(toc|ouv|play|liga|para|desliga|proxim)/.test(t), run:t => { if (/proxim/.test(t)) { byId('musicNextBtn')?.click(); return '<p>⏭ Próxima música.</p>'; } byId('musicPreviewBtn')?.click(); return `<p>🎵 ${esc(byId('musicPreviewBtn')?.textContent || '')} — use o mesmo comando para alternar.</p>`; }},
+    {test:t => /^(desfaz|desfazer|desfaca)\b/.test(t), run:() => { byId('projectUndoBtn')?.click(); return '<p>↶ Desfeito.</p>'; }},
+    {test:t => /^(refaz|refazer|refaca)\b/.test(t), run:() => { byId('projectRedoBtn')?.click(); return '<p>↷ Refeito.</p>'; }},
+    {test:t => /(backup)/.test(t) && imperative(t) && /(salv|faz|faca|guard)/.test(t), run:() => { byId('saveProjectBtn')?.click(); return '<p>💾 Pedi o backup; uma mensagem vai confirmar.</p>'; }}
+  ];
+  function kbAnswer(entry) {
+    const a = typeof entry.a === 'function' ? entry.a() : entry.a;
+    return a + (entry.x ? acts(entry.x()) : '');
+  }
+  function kbSearch(t) {
+    const words = t.split(' ').filter(w => w.length > 2);
+    let best = null, bestScore = 0;
+    const scored = KB.map(entry => {
+      let score = 0;
+      entry.k.forEach(k => { const nk = norm(k); if (t.includes(nk)) score += 2 + nk.split(' ').length; else { const parts = nk.split(' ').filter(w => w.length > 3); if (parts.length >= 2 && parts.every(p => words.some(w => w.startsWith(p.slice(0, 5))))) score += 1.5; } });
+      return {entry, score};
+    }).sort((a, b) => b.score - a.score);
+    if (scored[0] && scored[0].score > 0) { best = scored[0].entry; bestScore = scored[0].score; }
+    return {best, bestScore, others: scored.filter(s => s.score >= 3).slice(1, 4).map(s => s.entry)};
+  }
+  function answer(raw) {
+    const t = norm(raw);
+    if (!t) return '<p>Escreva sua dúvida ou o que deseja que eu faça.</p>';
+    if (!ready()) return '<p>Aguarde o projeto terminar de carregar e tente de novo.</p>';
+    const kb = kbSearch(t);
+    // Perguntas de "como fazer" vão primeiro para a base de conhecimento.
+    if (question(t) && kb.best && kb.bestScore >= 3) return kbAnswer(kb.best) + related(kb.others);
+    for (const intent of INTENTS) {
+      let ok = false; try { ok = intent.test(t); } catch (e) { ok = false; }
+      if (ok) { const out = intent.run(t, raw); return out === undefined ? '' : out; }
+    }
+    if (kb.best) return kbAnswer(kb.best) + related(kb.others);
+    return `<p>Não entendi bem. 🤔 Tente com outras palavras ou escolha um destes:</p>` + acts([
+      act('🔎 Analisar meus slides', analysisHtml, 'pri'), act('🎬 Como gerar o MP4?', () => kbAnswer(KB[0])),
+      act('🖼️ Inserir figura', () => answer('inserir figura')), act('⭐ Boas práticas', () => kbAnswer(KB[KB.length - 1])),
+      act('❓ O que você faz?', helpHtml)]);
+  }
+  function related(list) { return list.length ? '<p style="margin-top:8px;opacity:.8">Relacionado:</p>' + acts(list.map(e => act(esc(e.q), () => kbAnswer(e)))) : ''; }
+  function helpHtml() {
+    return `<p><b>Posso tirar dúvidas e fazer por você:</b></p><ul>
+      <li>🔎 <b>Analisar</b> os slides com boas práticas e corrigir (“analise meus slides”)</li>
+      <li>🎬 <b>Gerar</b> MP4, PowerPoint, fotos para TV ou PDF (“gere o mp4”)</li>
+      <li>🖼️ <b>Inserir</b> fotos e figuras (“inserir foto no lado incorreto”, “colocar figura livre”)</li>
+      <li>🏷️ Etiquetas e textos (“coloque etiqueta use epi”, “adicionar texto: Use luvas”)</li>
+      <li>📄 Páginas: criar, duplicar, excluir, ocultar, ir para (“novo slide sobre uso de capacete”, “ocultar slide 3”)</li>
+      <li>🔁 Tipo e cores (“mudar para figura + texto”, “cores segurança em todos”)</li>
+      <li>🧹 Organizar (“organize o texto em tópicos”, “padronizar títulos”, “intervalo 15”)</li>
+      <li>▶ Apresentar, pausar em um slide e tocar música</li></ul>
+      <p>Também explico qualquer função: marcações, enquadramento, fontes, quiosque, sincronização…</p>`;
+  }
+  function welcome(again) {
+    const P = app().pages;
+    return `<p>${again ? 'Olá de novo!' : 'Olá! Eu sou o <b>Cérebro SESE</b> 🧠'} Tiro dúvidas sobre o editor, analiso seus slides com boas práticas e faço ações por você, como gerar o MP4 ou inserir figuras.</p>` +
+      (P.length ? `<p>Seu projeto tem <b>${P.length}</b> slide(s). Quer que eu analise?</p>` : '') +
+      acts([act('🔎 Analisar meus slides', analysisHtml, 'pri'), act('❓ O que você faz?', helpHtml)]);
+  }
+
+  /* ---------------- Interface ---------------- */
+  const CHIPS = ['Analisar meus slides', 'Gerar MP4', 'Inserir figura', 'Novo slide', 'Boas práticas', 'Resumo do projeto', 'Organizar texto', 'Como marcar a foto?'];
+  byId('brainChips').innerHTML = CHIPS.map(c => `<button type="button">${esc(c)}</button>`).join('');
+  byId('brainChips').addEventListener('click', e => { const b = e.target.closest('button'); if (b) send(b.textContent); });
+  let greeted = false;
+  function panelOpen() {
+    panel.hidden = false; fab.setAttribute('aria-expanded', 'true'); fab.querySelector('.brain-dot').hidden = true;
+    if (!greeted) { greeted = true; say(welcome(false)); }
+    setTimeout(() => input.focus({preventScroll:true}), 30);
+  }
+  function panelClose() { panel.hidden = true; fab.setAttribute('aria-expanded', 'false'); }
+  fab.addEventListener('click', () => panel.hidden ? panelOpen() : panelClose());
+  byId('brainClose').addEventListener('click', () => { panelClose(); fab.focus(); });
+  panel.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); panelClose(); fab.focus(); } });
+  function send(text) {
+    text = String(text || '').trim(); if (!text) return;
+    me(text); input.value = ''; input.style.height = '';
+    const typing = say('<span class="b-typing"><span></span><span></span><span></span></span>');
+    // Executa já (mantém o clique do usuário ativo para abrir a escolha de arquivos).
+    let out;
+    try { out = answer(text); } catch (error) { console.error(error); out = '<p>⚠️ Algo deu errado: ' + esc(error.message || error) + '</p>'; }
+    setTimeout(() => { if (out) { typing.innerHTML = out; scrollDown(); } else typing.remove(); }, 260);
+  }
+  byId('brainForm').addEventListener('submit', e => { e.preventDefault(); send(input.value); });
+  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input.value); } e.stopPropagation(); });
+  input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = Math.min(110, input.scrollHeight) + 'px'; });
+  // Atalho: Ctrl+/ abre o assistente.
+  document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === '/' && !document.body.classList.contains('tv-mode')) { e.preventDefault(); panel.hidden ? panelOpen() : panelClose(); } });
+
+  window.seseBrain = { ask: text => answer(text), send, analyze, open: panelOpen, close: panelClose };
 })();
 
 </script>
